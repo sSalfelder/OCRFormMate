@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+
+<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="151.0" prefWidth="650.0" style="-fx-spacing: 30; -fx-alignment: center;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.ssalfelder.ocrformmate.Controller">
+   <children>
+      <Button mnemonicParsing="false" onAction="#citizenClick" prefHeight="96.0" prefWidth="262.0" text="Bürger">
+         <HBox.margin>
+            <Insets left="10.0" />
+         </HBox.margin>
+         <font>
+            <Font size="24.0" />
+         </font></Button>
+      <Button mnemonicParsing="false" onAction="#clerkClick" prefHeight="98.0" prefWidth="251.0" text="Sachbearbeiter">
+         <HBox.margin>
+            <Insets right="10.0" />
+         </HBox.margin>
+         <font>
+            <Font size="24.0" />
+         </font></Button>
+   </children>
+</HBox>
