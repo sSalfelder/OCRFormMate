@@ -9,12 +9,12 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" prefHeight="690.0" prefWidth="793.0" spacing="20.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.ssalfelder.ocrformmate.Controller">
+<VBox alignment="TOP_CENTER" prefHeight="690.0" prefWidth="793.0" spacing="20.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.ssalfelder.ocrformmate.controller.Controller">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
     <children>
-        <VBox alignment="TOP_CENTER" prefHeight="87.0" prefWidth="479.0" spacing="20.0" style="-fx-background-color: #cdcdcd; -fx-border-radius: 10; -fx-background-radius: 10; -fx-effect: dropshad;">
+        <VBox alignment="TOP_CENTER" prefHeight="87.0" prefWidth="479.0" spacing="20.0" style="-fx-background-color: #cdcdcd; -fx-border-radius: 10; -fx-background-radius: 10;">
             <padding>
                 <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
             </padding>
