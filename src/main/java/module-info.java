@@ -10,4 +10,6 @@ module com.github.ssalfelder.ocrformmate {
 
     opens com.github.ssalfelder.ocrformmate to javafx.fxml;
     exports com.github.ssalfelder.ocrformmate;
+    exports com.github.ssalfelder.ocrformmate.controller;
+    opens com.github.ssalfelder.ocrformmate.controller to javafx.fxml;
 }
