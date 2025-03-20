@@ -7,6 +7,13 @@ module com.github.ssalfelder.ocrformmate {
     requires net.synedra.validatorfx;
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.bootstrapfx.core;
+    requires spring.data.commons;
+    requires spring.web;
+    requires spring.beans;
+    requires org.apache.tomcat.embed.core;
+    requires jakarta.persistence;
+    requires spring.boot.autoconfigure;
+    requires spring.boot;
 
     opens com.github.ssalfelder.ocrformmate to javafx.fxml;
     exports com.github.ssalfelder.ocrformmate;
