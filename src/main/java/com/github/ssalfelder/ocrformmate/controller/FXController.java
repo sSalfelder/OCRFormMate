@@ -12,7 +12,8 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class Controller {
+
+public class FXController {
     private Stage stage;
     private Scene scene;
     private Parent root;
@@ -25,30 +26,30 @@ public class Controller {
 
     @FXML
     protected void citizenClick(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("citizen.fxml"));
+        root = FXMLLoader.load(getClass().getResource("/com/github/ssalfelder/ocrformmate/fxml/citizen.fxml"));
         switchScene(event);
     }
     @FXML
     protected void clerkClick(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("clerk.fxml"));
+        root = FXMLLoader.load(getClass().getResource("/com/github/ssalfelder/ocrformmate/fxml/clerk.fxml"));
         switchScene(event);
     }
 
     @FXML
     protected void goBack(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("main.fxml"));
+        root = FXMLLoader.load(getClass().getResource("/com/github/ssalfelder/ocrformmate/fxml/main.fxml"));
         switchScene(event);
     }
 
     @FXML
     protected void registrationClerk(ActionEvent event) throws  IOException {
-        root = FXMLLoader.load(getClass().getResource("admin-password-dialog.fxml"));
+        root = FXMLLoader.load(getClass().getResource("/com/github/ssalfelder/ocrformmate/fxml/admin-password-dialog.fxml"));
         switchScene(event);
     }
 
     @FXML
     protected void registrationCitizen(ActionEvent event) throws  IOException {
-        root = FXMLLoader.load(getClass().getResource("registration-citizen.fxml"));
+        root = FXMLLoader.load(getClass().getResource("/com/github/ssalfelder/ocrformmate/fxml/registration-citizen.fxml"));
         switchScene(event);
     }
 
