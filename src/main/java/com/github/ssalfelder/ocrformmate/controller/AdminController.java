@@ -16,7 +16,7 @@ public class AdminController {
     @Autowired
     private AdminRepository adminRepository;
 
-    @PostMapping("/register")
+    @PostMapping("/admin/register")
     private ResponseEntity<Admin> register (@RequestBody Admin newAdmin) {
         //generate secret
         newAdmin.setSecret(UUID.randomUUID().toString());
