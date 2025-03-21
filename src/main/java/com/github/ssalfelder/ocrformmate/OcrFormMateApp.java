@@ -4,11 +4,14 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
 
 @SpringBootApplication
 public class OcrFormMateApp extends Application {
@@ -17,8 +20,10 @@ public class OcrFormMateApp extends Application {
 
     @Override
     public void init() throws Exception {
+
         // Spring Boot-Kontext starten
         springContext = SpringApplication.run(OcrFormMateApp.class);
+
     }
 
     @Override

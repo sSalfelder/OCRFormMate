@@ -25,6 +25,9 @@ public class FXController {
     private TextField adminPassword;
 
     @FXML
+    private TextField adminSecret;
+
+    @FXML
     protected void citizenClick(ActionEvent event) throws IOException {
         root = FXMLLoader.load(getClass().getResource("/com/github/ssalfelder/ocrformmate/fxml/citizen.fxml"));
         switchScene(event);
@@ -64,8 +67,14 @@ public class FXController {
     }
 
     @FXML
-    protected void adminPassClick() {
+    protected void adminSecretClick() {
+        if (!adminSecret.getText().isEmpty()) {
+            String secretInput = adminSecret.getText();
 
+        }
+        else {
+            showWarningWindow("Fehlende Eingabe", "Bitte geben Sie den Secret-Key ein.");
+        }
     }
 
 
@@ -95,6 +104,11 @@ public class FXController {
      */
     private void showErrorWindow(String title, String message){
         Alert window = new Alert(Alert.AlertType.ERROR);
+        showWindow(title, message, window);
+    }
+
+    private void showWarningWindow(String title, String message){
+        Alert window = new Alert(Alert.AlertType.WARNING);
         showWindow(title, message, window);
     }
 
