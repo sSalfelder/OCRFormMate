@@ -3,6 +3,7 @@ package com.github.ssalfelder.ocrformmate;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
@@ -16,7 +17,7 @@ import java.sql.DriverManager;
 @SpringBootApplication
 public class OcrFormMateApp extends Application {
 
-    private ConfigurableApplicationContext springContext;
+    private static ConfigurableApplicationContext springContext;
 
     @Override
     public void init() throws Exception {
@@ -28,10 +29,13 @@ public class OcrFormMateApp extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(
+        FXMLLoader loader = new FXMLLoader(
                 OcrFormMateApp.class.getResource("/com/github/ssalfelder/ocrformmate/fxml/main.fxml"));
 
-        Scene scene = new Scene(fxmlLoader.load(), 650, 151);
+        loader.setControllerFactory(springContext::getBean);
+
+        Parent root = loader.load();
+        Scene scene = new Scene(root, 650, 151);
         stage.setTitle("OCRFormMate");
         stage.setScene(scene);
         stage.show();
@@ -42,6 +46,10 @@ public class OcrFormMateApp extends Application {
         // Beim Beenden JavaFX und Spring Boot sauber herunterfahren
         springContext.close();
         Platform.exit();
+    }
+
+    public static ConfigurableApplicationContext getContext() {
+        return springContext;
     }
 
     public static void main(String[] args) {
