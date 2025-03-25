@@ -46,6 +46,9 @@ def recognize_handwriting():
         # Format: [ [Koordinaten, (Text, Konfidenz)], ... ]
         result = ocr_model.ocr(np_img, cls=True)
 
+        if not result or all(len(line) == 0 for line in result):
+            return jsonify({"error": "No text detected in image."}), 400
+
         # Wir extrahieren aus jedem erkannten Bereich nur den Text
         recognized_lines = []
         for page in result:
