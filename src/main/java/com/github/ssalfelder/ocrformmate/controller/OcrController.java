@@ -1,6 +1,7 @@
 package com.github.ssalfelder.ocrformmate.controller;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.text.Normalizer;
 
 import com.github.ssalfelder.ocrformmate.init.OpenCvLoader;
@@ -10,7 +11,10 @@ import com.github.ssalfelder.ocrformmate.service.OcrResultService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import com.github.ssalfelder.ocrformmate.service.OcrService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +40,8 @@ public class OcrController {
         this.documentAlignmentService = documentAlignmentService;
         this.formFieldDetectionService = formFieldDetectionService;
     }
+    @FXML
+    private ComboBox<String> formTypeComboBox;
 
     @FXML
     private Button ocrButton;
@@ -43,10 +49,19 @@ public class OcrController {
     @FXML
     private TextArea resultTextArea;
 
+    @FXML
+    private ImageView imageView;
+
+    private final String[] FORMTYPE = {"Auto", "Buergergeld", "Anmeldung"};
+
     // Der Service, der den OCR-Aufruf abwickelt
     private OcrService ocrService = new OcrService();
 
-
+    @FXML
+    private void initialize(){
+        formTypeComboBox.getItems().addAll(FORMTYPE);
+        formTypeComboBox.getSelectionModel().selectFirst();
+    }
 
     // Diese Methode wird beim Klick auf den Button aufgerufen
     @FXML
@@ -56,6 +71,7 @@ public class OcrController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Wählen sie eine Bilddatei mit Formulardaten aus");
         File selectedFile = fileChooser.showOpenDialog(ocrButton.getScene().getWindow());
+        String formType = formTypeComboBox.getValue();
 
         if (selectedFile != null) {
             try {
@@ -78,13 +94,16 @@ public class OcrController {
                 Mat alignedMat = imread(alignedPath);
 
                 // Formularfelder markieren
-                Mat withFieldsMarked = formFieldDetectionService.detectAndDrawFields(alignedMat);
+                Mat withFieldsMarked = formFieldDetectionService.detectAndDrawFields(alignedMat, formType);
 
                 // Debug-/Vorschau-Anzeige (falls gewünscht)
                 // showPreview(withFieldsMarked);
 
                 // Das markierte Bild ggf. erneut speichern (zur Kontrolle)
                 imwrite("debug_fields_marked.png", withFieldsMarked);
+
+                Image image = new Image(new FileInputStream("form_preview.png"));
+                imageView.setImage(image);
 
                 // OCR-Service aufrufen (hier ggf. das markierte Bild nehmen oder
                 // besser das Original/entzerrte Bild ohne Markierungen, je nach Bedarf)
