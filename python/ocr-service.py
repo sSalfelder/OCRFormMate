@@ -1,30 +1,19 @@
 #!/usr/bin/env python3
 # ocr-service.py
 
-# !/usr/bin/env python3
-# ocr-service.py
-
 import os
 import numpy as np
 from flask import Flask, request, jsonify
 from PIL import Image
-
 from paddleocr import PaddleOCR
 
 app = Flask(__name__)
 
-# Sie können bei Bedarf weitere Parameter einstellen,
-# z.B. use_angle_cls=True für Schräglagen-Klassifikation usw.
-# Für Deutsche Schrift: lang='de'
-ocr_model = PaddleOCR(use_angle_cls=True, lang="en")  # Beispiel: englisches Modell
-
+# PaddleOCR-Modell initialisieren
+ocr_model = PaddleOCR(use_angle_cls=True, lang="en")  # ggf. lang="de"
 
 @app.route("/handwriting/recognize", methods=["POST"])
 def recognize_handwriting():
-    """
-    Erwartet multipart/form-data mit Key "image".
-    Führt PaddleOCR auf dem Bild aus und gibt erkannten Text als JSON zurück.
-    """
     if "image" not in request.files:
         return jsonify({"error": "No 'image' file in request"}), 400
 
@@ -37,16 +26,29 @@ def recognize_handwriting():
     except Exception as e:
         return jsonify({"error": f"Cannot open file: {e}"}), 400
 
-    # In NumPy-Array umwandeln
     np_img = np.array(pil_img)
 
     try:
-        # PaddleOCR gibt eine Liste von Seiten zurück.
-        # Jede Seite ist wieder eine Liste erkannter Textbereiche
-        # Format: [ [Koordinaten, (Text, Konfidenz)], ... ]
         result = ocr_model.ocr(np_img, cls=True)
 
-        # Wir extrahieren aus jedem erkannten Bereich nur den Text
+        # Handschrift-Erkennung anhand niedriger Konfidenz
+        handwritten_blocks = [
+            box_data[1][0]  # erkannter Text
+            for page in result
+            for box_data in page
+            if box_data[1][1] < 0.85  # Konfidenz unter Schwelle
+        ]
+
+        if not handwritten_blocks:
+            return jsonify({
+                "text": "",
+                "skipped": True,
+                "reason": "Nur gedruckter Text erkannt"
+            }), 200
+
+        if not result or all(len(line) == 0 for line in result):
+            return jsonify({"error": "No text detected in image."}), 400
+
         recognized_lines = []
         for page in result:
             for box_data in page:
@@ -60,8 +62,6 @@ def recognize_handwriting():
 
     return jsonify({"text": recognized_text})
 
-
 if __name__ == "__main__":
-    # Beispiel: 127.0.0.1:5000
     app.run(host="127.0.0.1", port=5000, debug=True)
 

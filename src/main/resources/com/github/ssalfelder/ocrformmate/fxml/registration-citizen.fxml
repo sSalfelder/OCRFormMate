@@ -1,14 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
+<BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.github.ssalfelder.ocrformmate.controller.MainController"
-            prefHeight="400.0" prefWidth="600.0">
+            prefWidth="600" prefHeight="400"
+            fx:controller="com.github.ssalfelder.ocrformmate.controller.RegistrationCitizenController">
 
-</AnchorPane>
+    <top>
+        <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-background-color: #f0f0f0;">
+            <padding><Insets top="10" left="10" right="10" bottom="10"/></padding>
+            <Label text="Benutzerregistrierung" />
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Zurück" fx:id="backButton"/>
+        </HBox>
+    </top>
+
+    <center>
+        <GridPane hgap="10" vgap="10">
+            <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+
+            <Label text="Vorname:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <TextField fx:id="firstnameField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+            <Label text="Nachname:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <TextField fx:id="lastnameField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+            <Label text="Postleitzahl:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <TextField fx:id="postalCodeField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+            <Label text="Straße:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+            <TextField fx:id="streetField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+            <Label text="Hausnummer:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+            <TextField fx:id="houseNumberField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+            <Label text="Ort:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+            <TextField fx:id="cityField" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+            <Label text="Telefonnummer:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+            <VBox spacing="2" GridPane.rowIndex="6" GridPane.columnIndex="1">
+                <TextField fx:id="phoneField"/>
+                <Label text="optional" style="-fx-font-size: 10px; -fx-text-fill: grey;"/>
+            </VBox>
+
+            <Label text="E-Mail:" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+            <TextField fx:id="emailField" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+
+            <Label text="Passwort:" GridPane.rowIndex="8" GridPane.columnIndex="0"/>
+            <PasswordField fx:id="passwordField" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
+
+            <Button text="Registrieren" GridPane.rowIndex="9" GridPane.columnIndex="1"/>
+        </GridPane>
+    </center>
+</BorderPane>

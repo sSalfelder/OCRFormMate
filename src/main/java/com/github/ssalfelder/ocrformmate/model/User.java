@@ -2,7 +2,10 @@ package com.github.ssalfelder.ocrformmate.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
@@ -19,11 +22,26 @@ public class User {
     @Column(name = "Nachname", nullable = false)
     private String lastname;
 
+    @Column(name = "Telefonnummer")
+    private String phoneNumber;
+
     @Column(name = "Email", unique = true, nullable = false)
     private String email;
 
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "adresse_id", referencedColumnName = "id")
+    private Address address;
+
     @Column(name = "Passwort", nullable = false)
     private String password;
+
+    @Column(name = "Erstellt", updatable = false)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @Column(name = "Aktualisiert")
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
     private String secret;
 
@@ -43,6 +61,14 @@ public class User {
         this.lastname = lastname;
     }
 
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
     public String getSecret() {
         return secret;
     }
@@ -60,6 +86,14 @@ public class User {
         this.id = id;
     }
 
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
     public String getEmail() {
         return email;
     }
@@ -74,5 +108,21 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
