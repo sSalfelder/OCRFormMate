@@ -1,47 +1,93 @@
 package com.github.ssalfelder.ocrformmate.controller;
 
-
+import com.github.ssalfelder.ocrformmate.dto.UserRegistrationDTO;
+import com.github.ssalfelder.ocrformmate.model.Address;
 import com.github.ssalfelder.ocrformmate.model.User;
+import com.github.ssalfelder.ocrformmate.repository.AddressRepository;
 import com.github.ssalfelder.ocrformmate.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired
     private UserRepository userRepository;
 
-    @PostMapping("/user/register")
-    private ResponseEntity<User> register(@RequestBody User newUser) {
-        //generate secret
-        newUser.setSecret(UUID.randomUUID().toString());
+    @Autowired
+    private AddressRepository addressRepository;
 
-        var saveduser = userRepository.save(newUser);
-        return new ResponseEntity<User>(saveduser, HttpStatus.CREATED);
-    }
+    /**
+     * Registrierung eines neuen Users über DTO
+     */
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody UserRegistrationDTO dto) {
 
-    @GetMapping("/user")
-    private ResponseEntity<User> get(@RequestParam(value = "id") int id) {
-        var user = userRepository.findById(id);
-        if (user.isPresent()) {
-            return new ResponseEntity<User>(user.get(), HttpStatus.OK);
+        // Prüfen, ob E-Mail schon existiert
+        if (userRepository.findByEmailAndPassword(dto.getEmail(), dto.getPassword()).isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Benutzer mit dieser E-Mail existiert bereits.");
         }
-        return new ResponseEntity("No user found with id " + id, HttpStatus.NOT_FOUND);
+
+        // Adresse finden oder neu anlegen
+        Optional<Address> existing = addressRepository.findByStreetAndPostalCodeAndCity(
+                dto.getStreet(), dto.getPostalCode(), dto.getCity()
+        );
+
+        Address address = existing.orElseGet(() -> {
+            Address newAddress = new Address();
+            newAddress.setStreet(dto.getStreet());
+            newAddress.setPostalCode(dto.getPostalCode());
+            newAddress.setCity(dto.getCity());
+            return addressRepository.save(newAddress);
+        });
+
+        // Benutzer erstellen
+        User user = new User();
+        user.setFirstname(dto.getFirstname());
+        user.setLastname(dto.getLastname());
+        user.setEmail(dto.getEmail());
+        user.setPassword(dto.getPassword()); // 🔒 später verschlüsseln
+        user.setPhoneNumber(dto.getPhoneNumber());
+        user.setAddress(address);
+        user.setSecret(UUID.randomUUID().toString());
+
+        User savedUser = userRepository.save(user);
+
+        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
-    @GetMapping("/user/validate")
-    private ResponseEntity<String> validate(@RequestParam(value = "email") String email,
-                                            @RequestParam(value = "password") String password) {
+    /**
+     * Benutzer anhand der ID abrufen
+     */
+    @GetMapping
+    public ResponseEntity<?> get(@RequestParam(value = "id") int id) {
+        Optional<User> user = userRepository.findById(id);
+
+        if (user.isPresent()) {
+            return new ResponseEntity<>(user.get(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("No user found with id " + id, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     * Benutzer anhand von E-Mail + Passwort validieren
+     */
+    @GetMapping("/validate")
+    public ResponseEntity<String> validate(@RequestParam("email") String email,
+                                           @RequestParam("password") String password) {
+
         var validUser = userRepository.findByEmailAndPassword(email, password);
         if (validUser.isPresent()) {
-            return new ResponseEntity<String>("API Secret: " + validUser.get().getSecret(), HttpStatus.OK);
+            return new ResponseEntity<>("API Secret: " + validUser.get().getSecret(), HttpStatus.OK);
         }
 
-        return new ResponseEntity("Wrong credentials / not found.", HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>("Wrong credentials / not found.", HttpStatus.NOT_FOUND);
     }
 }
