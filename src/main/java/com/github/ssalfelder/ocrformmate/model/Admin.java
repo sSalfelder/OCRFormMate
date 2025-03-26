@@ -1,6 +1,10 @@
 package com.github.ssalfelder.ocrformmate.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 public class Admin {
@@ -16,6 +20,14 @@ public class Admin {
     private String password;
 
     private String secret;
+
+    @Column(name = "Erstellt", updatable = false)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @Column(name = "Aktualisiert")
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
     public Integer getId() {
         return id;
@@ -47,5 +59,21 @@ public class Admin {
 
     public void setSecret(String secret) {
         this.secret = secret;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
