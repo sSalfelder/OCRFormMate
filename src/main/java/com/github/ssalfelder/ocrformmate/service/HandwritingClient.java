@@ -14,14 +14,15 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 
 public class HandwritingClient {
+
     private final HttpClient httpClient = HttpClient.newHttpClient();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     public String recognize(File imageFile) throws IOException, InterruptedException {
         HttpRequest request = buildMultipartRequest(imageFile);
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
         if (response.statusCode() == 200) {
-            // parse JSON
-            // e.g. {"text":"Gelesener Text..."}
             return parseRecognizedText(response.body());
         } else {
             throw new RuntimeException("OCR error: " + response.statusCode());
@@ -29,17 +30,14 @@ public class HandwritingClient {
     }
 
     private HttpRequest buildMultipartRequest(File file) throws IOException {
-        // minimaler multipart example
-        // oder base64-Lösung
         String boundary = "----OCRBoundary1234";
         byte[] fileBytes = Files.readAllBytes(file.toPath());
-        // Body im multipart-Format
+
         String part1 = "--" + boundary + "\r\n"
                 + "Content-Disposition: form-data; name=\"image\"; filename=\"" + file.getName() + "\"\r\n"
                 + "Content-Type: image/png\r\n\r\n";
         String part2 = "\r\n--" + boundary + "--\r\n";
 
-        // Gesamtpayload
         byte[] payload = ByteBuffer
                 .allocate(part1.getBytes().length + fileBytes.length + part2.getBytes().length)
                 .put(part1.getBytes())
@@ -49,18 +47,20 @@ public class HandwritingClient {
 
         return HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:5000/handwriting/recognize"))
-                .header("Content-Type", "multipart/form-data; boundary="+boundary)
+                .header("Content-Type", "multipart/form-data; boundary=" + boundary)
                 .POST(HttpRequest.BodyPublishers.ofByteArray(payload))
                 .build();
     }
 
     private String parseRecognizedText(String json) {
-        // JSON parsen, z. B. using Jackson
-        // {"text":"Hello from handwriting"}
-        ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode root = mapper.readTree(json);
-            return root.get("text").asText();
+
+            if (root.has("skipped") && root.get("skipped").asBoolean()) {
+                return "__SKIPPED__"; // Platzhalter für: "Nur vorgedruckter Text erkannt"
+            }
+
+            return root.has("text") ? root.get("text").asText() : "";
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

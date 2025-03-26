@@ -7,8 +7,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.springframework.stereotype.Component;
 
@@ -30,7 +28,7 @@ public class MainController {
 
     @FXML
     protected void clerkClick(ActionEvent event) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/github/ssalfelder/ocrformmate/fxml/clerk.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/github/ssalfelder/ocrformmate/fxml/clerk-login.fxml"));
         loader.setControllerFactory(clazz -> OcrFormMateApp.getContext().getBean(clazz));
         root = loader.load();
         switchScene(event);
@@ -51,10 +49,9 @@ public class MainController {
         root = loader.load();
         switchScene(event);
     }
-
     @FXML
     protected void registrationCitizen(ActionEvent event) throws  IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/github/ssalfelder/ocrformmate/fxml/registration-citizen.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/github/ssalfelder/ocrformmate/fxml/registration-citizen-.fxml"));
         loader.setControllerFactory(clazz -> OcrFormMateApp.getContext().getBean(clazz));
         root = loader.load();
         switchScene(event);
