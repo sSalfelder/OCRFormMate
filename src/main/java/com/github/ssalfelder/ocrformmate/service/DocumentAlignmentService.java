@@ -1,8 +1,8 @@
 package com.github.ssalfelder.ocrformmate.service;
 
-import org.opencv.core.*;
-import org.opencv.imgcodecs.Imgcodecs;
-import org.opencv.imgproc.Imgproc;
+import org.bytedeco.opencv.global.opencv_imgcodecs;
+import org.bytedeco.opencv.global.opencv_imgproc;
+import org.bytedeco.opencv.opencv_core.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,132 +13,119 @@ import java.util.List;
 @Service
 public class DocumentAlignmentService {
 
-    /**
-     * Lädt ein Bild von disk und führt die perspektivische Entzerrung durch,
-     * falls ein rechteckiges Dokument gefunden wurde.
-     *
-     * @param inputImagePath Pfad zum Eingabebild (Foto des Formulars)
-     * @param outputImagePath Pfad, unter dem das entzerrte Bild gespeichert wird
-     * @return true, wenn erfolgreich entzerrt und gespeichert, false sonst
-     */
     public boolean alignDocument(String inputImagePath, String outputImagePath) {
-        // 1) Bild laden
-        Mat original = Imgcodecs.imread(inputImagePath);
+        // Bild laden
+        Mat original = opencv_imgcodecs.imread(inputImagePath);
         if (original.empty()) {
             System.err.println("Konnte Bild nicht laden: " + inputImagePath);
             return false;
         }
 
-        // 2) Vorverarbeitung: Graustufen + Kantenerkennung
+        // Vorverarbeitung: in Graustufen umwandeln, blurren, Kanten finden
         Mat gray = new Mat();
-        Imgproc.cvtColor(original, gray, Imgproc.COLOR_BGR2GRAY);
+        opencv_imgproc.cvtColor(original, gray, opencv_imgproc.COLOR_BGR2GRAY);
 
         Mat blurred = new Mat();
-        Imgproc.GaussianBlur(gray, blurred, new Size(5, 5), 0);
+        opencv_imgproc.GaussianBlur(gray, blurred, new Size(5, 5), 0);
 
         Mat edges = new Mat();
-        Imgproc.Canny(blurred, edges, 75, 200);
+        opencv_imgproc.Canny(blurred, edges, 75, 200);
 
-        // 3) Konturen finden
-        List<MatOfPoint> contours = new ArrayList<>();
+        // Konturen finden – hier erwartet findContours einen MatVector
+        MatVector contours = new MatVector();
         Mat hierarchy = new Mat();
-        Imgproc.findContours(edges, contours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
-
-        // 4) Kontur wählen, die vermutlich das Dokument ist
-        // z. B. größte Kontur, die ~4 Ecken hat
-        MatOfPoint2f docContour = findDocumentContour(contours, original.size());
-        if (docContour == null) {
-            System.err.println("Kein geeignetes Dokument gefunden.");
-            return false;
-        }
-
-        // 5) Perspektivische Transformation vorbereiten
-        // Sortiere Ecken: top-left, top-right, bottom-right, bottom-left
-        List<Point> sortedCorners = reorderCorners(docContour);
-
-        // 6) Ziel-Rechteck definieren (z. B. Breite/Höhe)
-        // Hier nur ein grobes Beispiel:
-        double width = 800;   // z. B. 800 px
-        double height = 1000; // z. B. 1000 px
-
-        MatOfPoint2f dstCorners = new MatOfPoint2f(
-                new Point(0, 0), new Point(width, 0),
-                new Point(width, height), new Point(0, height)
+        opencv_imgproc.findContours(
+                edges,
+                contours,
+                hierarchy,
+                opencv_imgproc.RETR_LIST,
+                opencv_imgproc.CHAIN_APPROX_SIMPLE
         );
 
-        // 7) Transformation berechnen und anwenden
-        MatOfPoint2f sortedCornersMat = new MatOfPoint2f();
-        sortedCornersMat.fromList(sortedCorners);
+        // Dokument-Kontur suchen
+        Point2fVector docContour = findDocumentContour(contours);
+        if (docContour == null) {
+            System.out.println("Kein Formularrahmen erkannt – verwende Originalbild.");
+            opencv_imgcodecs.imwrite(outputImagePath, original);
+            return true; // Weiterverarbeitung ohne Perspektivkorrektur
+        }
 
-        Mat transform = Imgproc.getPerspectiveTransform(sortedCornersMat, dstCorners);
+        // Ecken neu anordnen (top-left, top-right, bottom-right, bottom-left)
+        Point2fVector sortedCorners = reorderCorners(docContour);
+
+        // Zielgröße definieren
+        double width = 800;
+        double height = 1000;
+        Point2fVector dstCorners = new Point2fVector(
+                new Point2f(0, 0),
+                new Point2f((float) width, 0),
+                new Point2f((float) width, (float) height),
+                new Point2f(0, (float) height)
+        );
+
+        // Konvertiere die Point2fVector-Objekte in Mat-Objekte:
+        Mat srcMat = new Mat(sortedCorners);
+        Mat dstMat = new Mat(dstCorners);
+
+        // Perspektivische Transformation berechnen und anwenden
+        Mat transform = opencv_imgproc.getPerspectiveTransform(srcMat, dstMat);
         Mat aligned = new Mat();
-        Imgproc.warpPerspective(original, aligned, transform, new Size(width, height));
+        opencv_imgproc.warpPerspective(original, aligned, transform, new Size((int) width, (int) height));
 
-        // 8) Ergebnis speichern
-        boolean success = Imgcodecs.imwrite(outputImagePath, aligned);
+        boolean success = opencv_imgcodecs.imwrite(outputImagePath, aligned);
         if (!success) {
             System.err.println("Konnte ausgerichtetes Bild nicht speichern: " + outputImagePath);
         }
         return success;
     }
 
-    /**
-     * Sucht nach einer Kontur mit 4 Ecken (Rechteck / Polygon),
-     * die groß genug ist, um als Dokument durchzugehen.
-     */
-    private MatOfPoint2f findDocumentContour(List<MatOfPoint> contours, Size imgSize) {
-        // Sortiere nach absteigender Konturflaeche
-        contours.sort(Comparator.comparingDouble(Imgproc::contourArea));
-        Collections.reverse(contours);
+    private Point2fVector findDocumentContour(MatVector contours) {
+        // Sammle Kandidaten, deren approximierte Kontur genau 4 Ecken hat
+        List<Mat> candidates = new ArrayList<>();
+        for (long i = 0; i < contours.size(); i++) {
+            Mat contour = contours.get(i);
+            double area = opencv_imgproc.contourArea(contour);
+            if (area < 1000) continue;
 
-        for (MatOfPoint c : contours) {
-            double area = Imgproc.contourArea(c);
-            if (area < 1000) {
-                // Wenn zu klein, ignorieren
-                continue;
-            }
+            Mat approxCurve = new Mat();
+            opencv_imgproc.approxPolyDP(contour, approxCurve, 0.02 * opencv_imgproc.arcLength(contour, true), true);
 
-            // Approximiere Polygon
-            MatOfPoint2f approx = approximatePolygon(c);
-            if (approx.total() == 4) {
-                // 4 Ecken => könnte unser Dokument sein
-                return approx;
+            Point2fVector approx = new Point2fVector(approxCurve);
+            if (approx.size() == 4) {
+                candidates.add(contour);
             }
+        }
+
+        // Wenn Kandidaten gefunden wurden, wähle den mit der größten Fläche
+        if (!candidates.isEmpty()) {
+            Mat largest = Collections.max(candidates, Comparator.comparingDouble(opencv_imgproc::contourArea));
+            Mat approxCurve = new Mat();
+            opencv_imgproc.approxPolyDP(largest, approxCurve, 0.02 * opencv_imgproc.arcLength(largest, true), true);
+
+            // 2) Konvertiere das Ergebnis-Mat in einen Point2fVector
+            Point2fVector approx = new Point2fVector(approxCurve);
+            return approx;
         }
         return null;
     }
 
-    /**
-     * Wandelt MatOfPoint in MatOfPoint2f und approximiert
-     * (vereinfacht) die Kontur zu einem Polygon.
-     */
-    private MatOfPoint2f approximatePolygon(MatOfPoint contour) {
-        MatOfPoint2f contour2f = new MatOfPoint2f(contour.toArray());
-        double peri = Imgproc.arcLength(contour2f, true);
-        MatOfPoint2f approx = new MatOfPoint2f();
-        Imgproc.approxPolyDP(contour2f, approx, 0.02 * peri, true);
-        return approx;
-    }
+    private Point2fVector reorderCorners(Point2fVector polygon) {
+        // Konvertiere den Vector in eine List für einfaches Sortieren
+        List<Point2f> pts = new ArrayList<>();
+        for (long i = 0; i < polygon.size(); i++) {
+            pts.add(polygon.get(i));
+        }
 
-    /**
-     * Re-Order Ecken: Sucht top-left, top-right, bottom-right, bottom-left
-     * Basierend auf https://stackoverflow.com/a/38373300
-     */
-    private List<Point> reorderCorners(MatOfPoint2f polygon) {
-        List<Point> pts = new ArrayList<>(polygon.toList());
-        // Sortiere nach y
-        pts.sort(Comparator.comparingDouble(p -> p.y));
+        // Sortiere nach Y (kleinste Y-Werte oben)
+        pts.sort(Comparator.comparingDouble(p -> p.y()));
 
-        // Oberste zwei
-        Point top1 = pts.get(0);
-        Point top2 = pts.get(1);
-        // Unterste zwei
-        Point bottom1 = pts.get(2);
-        Point bottom2 = pts.get(3);
+        Point2f top1 = pts.get(0);
+        Point2f top2 = pts.get(1);
+        Point2f bottom1 = pts.get(2);
+        Point2f bottom2 = pts.get(3);
 
-        // Sortiere top1, top2 nach x
-        Point topLeft, topRight;
-        if (top1.x < top2.x) {
+        Point2f topLeft, topRight;
+        if (top1.x() < top2.x()) {
             topLeft = top1;
             topRight = top2;
         } else {
@@ -146,9 +133,8 @@ public class DocumentAlignmentService {
             topRight = top1;
         }
 
-        // Sortiere bottom1, bottom2 nach x
-        Point bottomLeft, bottomRight;
-        if (bottom1.x < bottom2.x) {
+        Point2f bottomLeft, bottomRight;
+        if (bottom1.x() < bottom2.x()) {
             bottomLeft = bottom1;
             bottomRight = bottom2;
         } else {
@@ -156,11 +142,13 @@ public class DocumentAlignmentService {
             bottomRight = bottom1;
         }
 
-        List<Point> ordered = new ArrayList<>();
-        ordered.add(topLeft);
-        ordered.add(topRight);
-        ordered.add(bottomRight);
-        ordered.add(bottomLeft);
+        // Erstelle einen neuen Point2fVector in der gewünschten Reihenfolge
+        Point2fVector ordered = new Point2fVector(4);
+        ordered.put(0, topLeft);
+        ordered.put(1, topRight);
+        ordered.put(2, bottomRight);
+        ordered.put(3, bottomLeft);
+
         return ordered;
     }
 }
