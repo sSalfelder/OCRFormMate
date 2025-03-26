@@ -1,56 +1,50 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" prefHeight="730.0" prefWidth="944.0" spacing="20.0"
-      xmlns="http://javafx.com/javafx/23.0.1"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.github.ssalfelder.ocrformmate.controller.MainController">
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-    </padding>
-    <children>
-        <VBox alignment="TOP_CENTER" prefHeight="87.0" prefWidth="479.0" spacing="20.0"
-              style="-fx-background-color: #cdcdcd; -fx-border-radius: 10; -fx-background-radius: 10;">
+<ScrollPane fitToWidth="true" fitToHeight="true"
+            xmlns="http://javafx.com/javafx/23.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.github.ssalfelder.ocrformmate.controller.MainController">
+    <content>
+        <VBox alignment="TOP_CENTER" spacing="20.0" fillWidth="true">
             <padding>
                 <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
             </padding>
             <children>
-                <HBox alignment="TOP_CENTER" prefHeight="40.0" prefWidth="439.0"
-                      style="-fx-spacing: 20; -fx-alignment: center;">
+                <!-- Login-Box -->
+                <VBox alignment="TOP_CENTER" spacing="20.0"
+                      style="-fx-background-color: #cdcdcd; -fx-border-radius: 10; -fx-background-radius: 10;">
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
                     <children>
-                        <Label alignment="CENTER" prefHeight="26.0" prefWidth="77.0" text="Benutzername" />
-                        <TextField />
+                        <HBox spacing="20.0" alignment="CENTER">
+                            <Label text="Benutzername" />
+                            <TextField />
+                        </HBox>
+                        <HBox spacing="20.0" alignment="CENTER">
+                            <Label text="Passwort" />
+                            <PasswordField />
+                        </HBox>
+                        <HBox spacing="20.0" alignment="CENTER">
+                            <Button text="Login" />
+                            <Button text="Reset" />
+                        </HBox>
                     </children>
+                </VBox>
+
+                <!-- OCR-Bereich mit Platzbedarf -->
+                <HBox VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+                    <fx:include source="ocrPane.fxml" />
                 </HBox>
-                <HBox alignment="TOP_CENTER" prefHeight="40.0" prefWidth="439.0"
-                      style="-fx-spacing: 20; -fx-alignment: center;">
-                    <children>
-                        <Label alignment="CENTER" prefHeight="26.0" prefWidth="77.0" text="Passwort" />
-                        <PasswordField />
-                    </children>
-                </HBox>
-                <HBox alignment="TOP_CENTER" prefHeight="40.0" prefWidth="439.0"
-                      style="-fx-spacing: 20; -fx-alignment: center;">
-                    <children>
-                        <Button mnemonicParsing="false" text="Login" />
-                        <Button layoutX="325.0" layoutY="10.0" mnemonicParsing="false" text="Reset" />
-                    </children>
-                </HBox>
+
             </children>
         </VBox>
-
-        <!-- Anpassung hier -->
-        <HBox VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
-            <fx:include source="ocrPane.fxml" />
-        </HBox>
-
-    </children>
-</VBox>
-
+    </content>
+</ScrollPane>
