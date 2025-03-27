@@ -1,0 +1,48 @@
+/* Grundlegendes Styling */
+.root {
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-size: 14px;
+    -fx-background-color: #f8f9fa;
+}
+
+/* Buttons */
+.button {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-padding: 6 12;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+.button:hover {
+    -fx-background-color: #45a049;
+}
+
+/* ComboBox */
+.combo-box {
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-padding: 4 8;
+}
+
+/* TextArea */
+.text-area {
+    -fx-control-inner-background: #ffffff;
+    -fx-border-color: #ccc;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 10;
+}
+
+/* ScrollPane mit ImageView */
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+.image-view {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 0);
+}
+
+/* Abstand zwischen Controls */
+.hbox, .vbox {
+    -fx-spacing: 10;
+    -fx-padding: 10;
+}
