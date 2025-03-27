@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.*?>
 
-<?import javafx.scene.control.ScrollPane?>
-<VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.ssalfelder.ocrformmate.controller.OcrController">
+<?import javafx.geometry.Insets?>
+<VBox xmlns="http://javafx.com/javafx/23.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.github.ssalfelder.ocrformmate.controller.OcrController" spacing="10"
+      stylesheets="@style.css">
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
     <children>
-        <HBox prefHeight="24.0" spacing="10.0">
+        <!-- Obere Steuerleiste -->
+        <HBox spacing="10.0">
             <children>
-            <ComboBox fx:id="formTypeComboBox" prefWidth="150.0" />
-            <Button fx:id="ocrButton" mnemonicParsing="false" onAction="#onOcrButtonClicked" prefHeight="26.0" prefWidth="113.0" text="OCR ausführen" />
+                <ComboBox fx:id="formTypeComboBox" prefWidth="150.0"/>
+                <Button fx:id="ocrButton" text="OCR ausführen" onAction="#onOcrButtonClicked"/>
             </children>
         </HBox>
-        <HBox VBox.vgrow="ALWAYS">
-            <children>
-                <SplitPane dividerPositions="0.5" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
-                    <items>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" />
-                        <AnchorPane minHeight="0.0" minWidth="0.0" />
-                    </items>
-                </SplitPane>
-                <TextArea fx:id="resultTextArea" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" />
-            </children>
-        </HBox>
-        <ScrollPane HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" fitToWidth="true" fitToHeight="true">
-            <content>
-                <ImageView fx:id="imageView" preserveRatio="true" pickOnBounds="true" />
-            </content>
-        </ScrollPane>
+
+        <!-- Hauptinhalt: Bild und OCR-Text nebeneinander -->
+        <SplitPane dividerPositions="0.5" VBox.vgrow="ALWAYS">
+            <items>
+                <!-- Bildanzeige mit Scrollfunktion -->
+                <ScrollPane fitToWidth="true" fitToHeight="true">
+                    <content>
+                        <ImageView fx:id="imageView" preserveRatio="true" pickOnBounds="true"/>
+                    </content>
+                </ScrollPane>
+
+                <!-- OCR Ergebnis -->
+                <TextArea fx:id="resultTextArea" wrapText="true"/>
+            </items>
+        </SplitPane>
     </children>
 </VBox>
