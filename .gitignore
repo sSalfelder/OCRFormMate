@@ -1,38 +1,23 @@
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# Python cache und virtuelle Umgebung
+__pycache__/
+*.pyc
+.venv/
 
-### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/libraries/
-*.iws
-*.iml
-*.ipr
+# Modelle und große Dateien
+models/
+dictionaries/
+*.pt
+*.bin
 
-### Eclipse ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+# Bilder und generierte Daten
+*.png
+*.jpg
+*.pdf
+form_preview.png
+aligned_temp.png
+converted_from_pdf.png
+normalized_input.png
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
-.vscode/
-
-### Mac OS ###
+# System-Dateien
 .DS_Store
+Thumbs.db

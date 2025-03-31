@@ -69,7 +69,6 @@ public class HandwritingClient {
 
         // 3. Anfrage an den neuen OCR-Endpoint
         HttpRequest request = HttpRequest.newBuilder()
-//           .uri(URI.create("http://localhost:5000/handwriting/recognizeFields")) //Druckschrifterkennung für paddleOCR
             .uri(URI.create("http://localhost:6000/handwriting/recognizeFields"))
             .header("Content-Type", "multipart/form-data; boundary=" + boundary)
             .POST(HttpRequest.BodyPublishers.ofByteArray(body.toByteArray()))
