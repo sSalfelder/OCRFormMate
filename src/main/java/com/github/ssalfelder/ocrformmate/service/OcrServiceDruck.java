@@ -5,11 +5,15 @@ import org.bytedeco.opencv.opencv_core.Rect;
 import java.io.File;
 import java.util.Map;
 
-public class OcrService {
+public class OcrServiceDruck {
     private HandwritingClient handwritingClient;
 
-    public OcrService() {
+    public OcrServiceDruck() {
         this.handwritingClient = new HandwritingClient();
+    }
+
+    public String handleHandwritingOCR(File inputFile) throws Exception {
+        return handwritingClient.recognize(inputFile);
     }
 
     public Map<String, String> recognizeFields(File imageFile, Map<String, Rect> fields, String formType) throws Exception {

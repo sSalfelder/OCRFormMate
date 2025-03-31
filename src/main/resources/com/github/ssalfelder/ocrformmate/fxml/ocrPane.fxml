@@ -16,8 +16,11 @@
         <!-- Obere Steuerleiste -->
         <HBox spacing="10.0">
             <children>
-                <ComboBox fx:id="formTypeComboBox" prefWidth="150.0"/>
-                <Button fx:id="ocrButton" text="OCR ausführen" onAction="#onOcrButtonClicked"/>
+                <ComboBox fx:id="formTypeComboBox" prefWidth="150.0" maxHeight="Infinity"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="ocrButton" text="OCR ausführen" onAction="#onOcrButtonClicked" maxHeight="Infinity"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <ProgressBar fx:id="progressBar" prefWidth="150.0" progress="0.0" visible="false" maxHeight="Infinity"/>
             </children>
         </HBox>
 
