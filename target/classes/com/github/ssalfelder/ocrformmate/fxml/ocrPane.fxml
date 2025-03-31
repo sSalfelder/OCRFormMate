@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+<VBox xmlns="http://javafx.com/javafx/23.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.github.ssalfelder.ocrformmate.controller.OcrController" spacing="10"
+      stylesheets="@style.css">
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+    <children>
+        <!-- Obere Steuerleiste -->
+        <HBox spacing="10.0">
+            <children>
+                <ComboBox fx:id="formTypeComboBox" prefWidth="150.0" maxHeight="Infinity"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="ocrButton" text="OCR ausführen" onAction="#onOcrButtonClicked" maxHeight="Infinity"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <ProgressBar fx:id="progressBar" prefWidth="150.0" progress="0.0" visible="false" maxHeight="Infinity"/>
+            </children>
+        </HBox>
+
+        <!-- Hauptinhalt: Bild und OCR-Text nebeneinander -->
+        <SplitPane dividerPositions="0.5" VBox.vgrow="ALWAYS">
+            <items>
+                <!-- Bildanzeige mit Scrollfunktion -->
+                <ScrollPane fitToWidth="true" fitToHeight="true">
+                    <content>
+                        <ImageView fx:id="imageView" preserveRatio="true" pickOnBounds="true"/>
+                    </content>
+                </ScrollPane>
+
+                <!-- OCR Ergebnis -->
+                <TextArea fx:id="resultTextArea" wrapText="true"/>
+            </items>
+        </SplitPane>
+    </children>
+</VBox>

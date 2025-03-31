@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="TOP_CENTER" prefHeight="87.0" prefWidth="479.0" spacing="20.0" style="-fx-background-color: #cdcdcd; -fx-border-radius: 10; -fx-background-radius: 10;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.ssalfelder.ocrformmate.controller.MainController" >
+   <padding>
+      <Insets bottom="20.0" />
+   </padding>
+   <children>
+      <ToolBar prefHeight="35.0" prefWidth="458.0">
+         <items>
+            <Button mnemonicParsing="false" onAction="#goBack" text="Zurück" />
+            <Label alignment="CENTER" prefHeight="29.0" prefWidth="321.0" text="Bitte Logindaten eingeben">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Button mnemonicParsing="false" onAction="#registrationClerk" text="Registrieren" />
+         </items>
+      </ToolBar>
+      <HBox alignment="TOP_CENTER" prefHeight="40.0" prefWidth="439.0" style="-fx-spacing: 20; -fx-alignment: center;">
+         <children>
+            <Label alignment="CENTER" prefHeight="26.0" prefWidth="77.0" text="Benutzername" />
+            <TextField fx:id="adminUsername" />
+         </children>
+      </HBox>
+      <HBox alignment="TOP_CENTER" prefHeight="40.0" prefWidth="439.0" style="-fx-spacing: 20; -fx-alignment: center;">
+         <children>
+            <Label alignment="CENTER" prefHeight="26.0" prefWidth="77.0" text="Passwort" />
+            <PasswordField fx:id="adminPassword" />
+         </children>
+      </HBox>
+      <HBox alignment="TOP_CENTER" prefHeight="40.0" prefWidth="439.0" style="-fx-spacing: 20; -fx-alignment: center;">
+         <children>
+            <Button mnemonicParsing="false" onAction="#clerkLoginClick" text="Login" />
+            <Button layoutX="325.0" layoutY="10.0" mnemonicParsing="false" onAction="#clerkResetClick" text="Reset" />
+         </children>
+      </HBox>
+   </children>
+   <effect>
+      <DropShadow offsetX="2.5" offsetY="2.5">
+         <color>
+            <Color opacity="0.5015197396278381" />
+         </color>
+      </DropShadow>
+   </effect>
+</VBox>
