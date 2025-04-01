@@ -1,26 +1,50 @@
-# Python cache und virtuelle Umgebung
+# === Python: Cache & virtuelle Umgebungen ===
 __pycache__/
+*.py[cod]
+python/.idea/
 *.pyc
+*.pyo
+*.pyd
 .venv/
+venv*/
+*.env
 
-# Modelle und große Dateien
-csvs/
-fonts/
-models/
-dictionaries/
+# === IntelliJ IDEA / JetBrains ===
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# === Maven / Java Build ===
+target/
+*.class
+
+# === Daten & Modelle (nicht versionieren) ===
+python/models/
+python/csvs/
+python/fonts/
+python/dictionaries/
 *.pt
 *.bin
+*.safetensors
 
-# Bilder und generierte Daten
+# === Generierte oder temporäre Bilder/PDFs ===
 *.png
 *.jpg
 *.pdf
 *.csv
-form_preview.png
-aligned_temp.png
-converted_from_pdf.png
-normalized_input.png
 
-# System-Dateien
+# Oder spezifisch, wenn du manche PNGs tracken willst:
+# form_preview.png
+# aligned_temp.png
+# normalized_input.png
+# debug_fields_marked.png
+# desktop.ini
+
+# === System-Dateien ===
 .DS_Store
 Thumbs.db
+
+# === Shell- & Log-Dateien ===
+*.sh
+*.log
