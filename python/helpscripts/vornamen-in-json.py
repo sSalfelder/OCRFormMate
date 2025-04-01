@@ -3,7 +3,7 @@ import json
 
 firstnames = set()
 
-with open("csvs/vornamen.csv", encoding="utf-8") as f:
+with open("../csvs/vornamen.csv", encoding="utf-8") as f:
     reader = csv.DictReader(f, delimiter=";")  # Semikolon als Trennzeichen
     for row in reader:
         firstname = row["vorname"].strip()
@@ -11,7 +11,7 @@ with open("csvs/vornamen.csv", encoding="utf-8") as f:
             firstnames.add(firstname)
 
 # Optional: speichern
-with open("dictionaries/Buergergeld.json", "r+", encoding="utf-8") as f:
+with open("../dictionaries/Buergergeld.json", "r+", encoding="utf-8") as f:
     data = json.load(f)
     data["vorname"] = sorted(firstnames)
     f.seek(0)

@@ -4,6 +4,8 @@ __pycache__/
 .venv/
 
 # Modelle und große Dateien
+csvs/
+fonts/
 models/
 dictionaries/
 *.pt
@@ -13,6 +15,7 @@ dictionaries/
 *.png
 *.jpg
 *.pdf
+*.csv
 form_preview.png
 aligned_temp.png
 converted_from_pdf.png

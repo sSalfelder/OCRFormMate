@@ -14,12 +14,11 @@
             <padding><Insets top="10" left="10" right="10" bottom="10"/></padding>
             <Label text="Benutzerregistrierung" />
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Zurück" fx:id="backButton"/>
         </HBox>
     </top>
 
     <center>
-        <GridPane hgap="10" vgap="10">
+        <GridPane hgap="10" vgap="10" alignment="CENTER" maxWidth="300">
             <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
 
             <Label text="Vorname:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>

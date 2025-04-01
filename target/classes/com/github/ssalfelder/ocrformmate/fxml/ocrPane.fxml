@@ -20,7 +20,7 @@
                 <Region HBox.hgrow="ALWAYS"/>
                 <Button fx:id="ocrButton" text="OCR ausführen" onAction="#onOcrButtonClicked" maxHeight="Infinity"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <ProgressBar fx:id="progressBar" prefWidth="150.0" progress="0.0" visible="false" maxHeight="Infinity"/>
+                <ProgressBar fx:id="progressBar" prefWidth="150.0" progress="0.0" visible="true" maxHeight="Infinity"/>
             </children>
         </HBox>
 

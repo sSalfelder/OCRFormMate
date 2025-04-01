@@ -3,7 +3,7 @@ import json
 
 postleitzahlen = set()
 
-with open("csvs/postleitzahlen.csv", encoding="utf-8") as f:
+with open("../csvs/postleitzahlen.csv", encoding="utf-8") as f:
     reader = csv.DictReader(f, delimiter=";")  # Semikolon als Trennzeichen
     for row in reader:
         plz = row["PLZ"].strip()
@@ -11,7 +11,7 @@ with open("csvs/postleitzahlen.csv", encoding="utf-8") as f:
             postleitzahlen.add(plz)
 
 # Optional: speichern
-with open("dictionaries/Buergergeld.json", "r+", encoding="utf-8") as f:
+with open("../dictionaries/Buergergeld.json", "r+", encoding="utf-8") as f:
     data = json.load(f)
     data["postleitzahl"] = sorted(postleitzahlen)
     f.seek(0)

@@ -7,6 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
 import org.springframework.stereotype.Component;
 
@@ -19,11 +20,18 @@ public class MainController {
     private Parent root;
 
     @FXML
+    private ComboBox<String> citizenAuthorityChooser;
+
+    // Combobox für die Bürger Scene
+    private final String[] FORMTYPE = {"Jobcenter", "Meldeamt"};
+
+    @FXML
     protected void citizenClick(ActionEvent event) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/github/ssalfelder/ocrformmate/fxml/citizen.fxml"));
         loader.setControllerFactory(clazz -> OcrFormMateApp.getContext().getBean(clazz));
         root = loader.load();
         switchScene(event);
+
     }
 
     @FXML
@@ -35,36 +43,19 @@ public class MainController {
     }
 
     @FXML
-    protected void goBack(ActionEvent event) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/github/ssalfelder/ocrformmate/fxml/main.fxml"));
-        loader.setControllerFactory(clazz -> OcrFormMateApp.getContext().getBean(clazz));
-        root = loader.load();
-        switchScene(event);
-    }
-
-    @FXML
-    protected void registrationClerk(ActionEvent event) throws  IOException {
+    protected void registrationClerk(ActionEvent event) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/github/ssalfelder/ocrformmate/fxml/admin-password-dialog.fxml"));
         loader.setControllerFactory(clazz -> OcrFormMateApp.getContext().getBean(clazz));
         root = loader.load();
         switchScene(event);
     }
+
     @FXML
-    protected void registrationCitizen(ActionEvent event) throws  IOException {
+    protected void registrationCitizen(ActionEvent event) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/github/ssalfelder/ocrformmate/fxml/registration-citizen-.fxml"));
         loader.setControllerFactory(clazz -> OcrFormMateApp.getContext().getBean(clazz));
         root = loader.load();
         switchScene(event);
-    }
-
-    @FXML
-    protected void clerkLoginClick() {
-
-    }
-
-    @FXML
-    protected void clerkResetClick() {
-
     }
 
     private void switchScene(ActionEvent event) {
@@ -74,3 +65,4 @@ public class MainController {
         stage.show();
     }
 }
+

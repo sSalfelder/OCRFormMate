@@ -12,7 +12,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="TOP_CENTER" prefHeight="87.0" prefWidth="479.0" spacing="20.0" style="-fx-background-color: #cdcdcd; -fx-border-radius: 10; -fx-background-radius: 10;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.ssalfelder.ocrformmate.controller.MainController">
+<VBox alignment="TOP_CENTER" prefHeight="87.0" prefWidth="479.0" spacing="20.0" style="-fx-background-color: #cdcdcd; -fx-border-radius: 10; -fx-background-radius: 10;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.ssalfelder.ocrformmate.controller.CitizenLoginController">
    <padding>
       <Insets bottom="20.0" />
    </padding>
@@ -31,19 +31,19 @@
       <HBox alignment="TOP_CENTER" prefHeight="40.0" prefWidth="439.0" style="-fx-spacing: 20; -fx-alignment: center;">
          <children>
             <Label alignment="CENTER" prefHeight="26.0" prefWidth="77.0" text="Benutzername" />
-            <TextField fx:id="adminUsername" />
+            <TextField fx:id="citizenUsername" />
          </children>
       </HBox>
       <HBox alignment="TOP_CENTER" prefHeight="40.0" prefWidth="439.0" style="-fx-spacing: 20; -fx-alignment: center;">
          <children>
             <Label alignment="CENTER" prefHeight="26.0" prefWidth="77.0" text="Passwort" />
-            <PasswordField fx:id="adminPassword" />
+            <PasswordField fx:id="citizenPassword" />
          </children>
       </HBox>
       <HBox alignment="TOP_CENTER" prefHeight="40.0" prefWidth="439.0" style="-fx-spacing: 20; -fx-alignment: center;">
          <children>
-            <Button mnemonicParsing="false" onAction="#clerkLoginClick" text="Login" />
-            <Button layoutX="325.0" layoutY="10.0" mnemonicParsing="false" onAction="#clerkResetClick" text="Reset" />
+            <Button mnemonicParsing="false" onAction="#citizenLoginClick" text="Login" />
+            <Button layoutX="325.0" layoutY="10.0" mnemonicParsing="false" onAction="#citizenResetClick" text="Reset" />
          </children>
       </HBox>
    </children>
