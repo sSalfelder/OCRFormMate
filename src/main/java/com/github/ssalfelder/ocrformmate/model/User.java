@@ -16,6 +16,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<OcrResult> ocrResults;
+
+
     @Column(name = "Vorname", nullable = false)
     private String firstname;
 

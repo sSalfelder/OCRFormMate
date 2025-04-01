@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.scene.control.PasswordField;
+import org.springframework.stereotype.Component;
 
 import java.net.http.*;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
 public class RegistrationCitizenController {
 
     @FXML private TextField firstnameField;

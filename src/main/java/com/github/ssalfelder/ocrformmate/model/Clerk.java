@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "Mitarbeiter")
@@ -18,6 +19,10 @@ public class Clerk {
     @Column(name = "Vorname", nullable = false)
     private String firstname;
 
+    @OneToMany(mappedBy = "clerk", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<OcrResult> ocrResults;
+
     @Column(name = "Nachname", nullable = false)
     private String lastname;
 
@@ -29,6 +34,9 @@ public class Clerk {
 
     @Column(name = "Passwort", nullable = false)
     private String password;
+
+    @Column(name = "Behörde")
+    private String authority;
 
     @Column(name = "Erstellt", updatable = false)
     @CreationTimestamp
@@ -60,6 +68,14 @@ public class Clerk {
 
     public void setPostalCode(String postalCode) {
         this.postalCode = postalCode;
+    }
+
+    public String getAuthority() {
+        return authority;
+    }
+
+    public void setAuthority(String authority) {
+        this.authority = authority;
     }
 
     private String secret;
