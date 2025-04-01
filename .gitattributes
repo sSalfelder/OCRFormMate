@@ -1,0 +1,12 @@
+# Textdateien (automatische Line-Endings normalisieren)
+* text=auto
+
+# Sicherstellen, dass große Binärdateien nicht diffed werden
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.safetensors binary
+*.ttf binary
+*.bin binary
+*.pt binary

@@ -1,50 +1,48 @@
-# === Python: Cache & virtuelle Umgebungen ===
+# === Python Umgebung & Cache ===
 __pycache__/
 *.py[cod]
-python/.idea/
-*.pyc
-*.pyo
-*.pyd
 .venv/
 venv*/
-*.env
 
-# === IntelliJ IDEA / JetBrains ===
+# === IDE & Build (IntelliJ, Maven, etc.) ===
 .idea/
 *.iml
-*.ipr
-*.iws
-
-# === Maven / Java Build ===
 target/
 *.class
 
-# === Daten & Modelle (nicht versionieren) ===
+# === Virtuelle Umgebungen & Umgebungsdateien ===
+*.env
+*.venv
+
+# === Modell- & Datendateien ===
 python/models/
+python/dictionaries/
 python/csvs/
 python/fonts/
-python/dictionaries/
 *.pt
 *.bin
 *.safetensors
+*.json
 
-# === Generierte oder temporäre Bilder/PDFs ===
+# === Assets & temporäre Dateien ===
 *.png
 *.jpg
+*.jpeg
 *.pdf
 *.csv
 
-# Oder spezifisch, wenn du manche PNGs tracken willst:
-# form_preview.png
-# aligned_temp.png
-# normalized_input.png
-# debug_fields_marked.png
-# desktop.ini
+# === Namen für häufige Debug-Dateien ===
+form_preview.png
+aligned_temp.png
+debug_fields_marked.png
+normalized_input.png
 
-# === System-Dateien ===
+# === Systemdateien ===
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# === Shell- & Log-Dateien ===
-*.sh
+# === Logs & Shell ===
 *.log
+*.sh
+
