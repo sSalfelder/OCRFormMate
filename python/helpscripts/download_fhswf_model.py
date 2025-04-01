@@ -1,7 +1,7 @@
 from transformers import TrOCRProcessor, VisionEncoderDecoderModel
 import os
 
-save_dir = "./models/fhswf_trocr"
+save_dir = "../models/fhswf_trocr"
 
 os.makedirs(save_dir, exist_ok=True)
 
