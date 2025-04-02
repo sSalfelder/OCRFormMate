@@ -11,10 +11,5 @@ with open("../csvs/vornamen.csv", encoding="utf-8") as f:
             firstnames.add(firstname)
 
 # Optional: speichern
-with open("../dictionaries/Buergergeld.json", "r+", encoding="utf-8") as f:
-    data = json.load(f)
-    data["vorname"] = sorted(firstnames)
-    f.seek(0)
-    json.dump(data, f, indent=2, ensure_ascii=False)
-    f.truncate()
-
+with open("../dictionaries/vornamen.json", "w", encoding="utf-8") as f:
+    json.dump(sorted(firstnames), f, indent=2, ensure_ascii=False)

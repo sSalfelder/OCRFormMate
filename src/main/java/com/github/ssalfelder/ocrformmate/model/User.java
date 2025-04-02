@@ -14,6 +14,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "Kundennummer")
     private Integer id;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
@@ -27,15 +28,15 @@ public class User {
     @Column(name = "Nachname", nullable = false)
     private String lastname;
 
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "adresse_id", referencedColumnName = "id")
+    private Address address;
+
     @Column(name = "Telefonnummer")
     private String phoneNumber;
 
     @Column(name = "Email", unique = true, nullable = false)
     private String email;
-
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "adresse_id", referencedColumnName = "id")
-    private Address address;
 
     @Column(name = "Passwort", nullable = false)
     private String password;

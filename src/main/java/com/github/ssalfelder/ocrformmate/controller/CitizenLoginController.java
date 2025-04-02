@@ -35,13 +35,15 @@ public class CitizenLoginController {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/github/ssalfelder/ocrformmate/" +
                 "fxml/citizen-registration.fxml"));
         loader.setControllerFactory(clazz -> OcrFormMateApp.getContext().getBean(clazz));
-        Parent loginRoot = loader.load();
+        Parent registrationRoot = loader.load();
 
-        Stage stage = new Stage();
-        stage.setScene(new Scene(loginRoot));
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        Scene scene = (new Scene(registrationRoot));
+        scene.getStylesheets().add(getClass().getResource("/CSS/style.css").toExternalForm()); // <– hier!
+        stage.setScene(scene);
         stage.setTitle("Registrierung");
-        stage.initModality(Modality.APPLICATION_MODAL); // blockiert andere Fenster
-        stage.showAndWait();
+        stage.show();
     }
 
     @FXML

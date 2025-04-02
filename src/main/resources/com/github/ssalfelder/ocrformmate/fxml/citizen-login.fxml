@@ -30,7 +30,7 @@
       </ToolBar>
       <HBox alignment="TOP_CENTER" prefHeight="40.0" prefWidth="439.0" style="-fx-spacing: 20; -fx-alignment: center;">
          <children>
-            <Label alignment="CENTER" prefHeight="26.0" prefWidth="77.0" text="Benutzername" />
+            <Label alignment="CENTER" prefHeight="26.0" prefWidth="77.0" text="Email" />
             <TextField fx:id="citizenUsername" />
          </children>
       </HBox>

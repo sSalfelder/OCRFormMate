@@ -22,7 +22,7 @@ public class OcrResult {
 
     // für Bürger
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "Kundennummer")
     private User user;
 
     // für Sachbearbeiter

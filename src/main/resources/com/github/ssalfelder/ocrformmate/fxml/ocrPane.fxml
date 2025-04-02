@@ -8,7 +8,7 @@
 <VBox xmlns="http://javafx.com/javafx/23.0.1"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.github.ssalfelder.ocrformmate.controller.OcrController" spacing="10"
-      stylesheets="@style.css">
+      stylesheets="@../../../../../CSS/style.css">
     <padding>
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>

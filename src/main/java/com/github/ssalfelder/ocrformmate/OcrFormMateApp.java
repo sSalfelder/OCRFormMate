@@ -10,11 +10,14 @@ import javafx.stage.Stage;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
 @SpringBootApplication
+@ComponentScan(basePackages = "com.github.ssalfelder.ocrformmate")
 public class OcrFormMateApp extends Application {
 
     private static ConfigurableApplicationContext springContext;

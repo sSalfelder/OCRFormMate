@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -28,38 +29,46 @@ public class UserController {
      */
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserRegistrationDTO dto) {
+        try {
+            System.out.println("Registrierung gestartet");
+            System.out.println("DTO erhalten: ");
+            // Prüfen, ob E-Mail schon existiert
+            if (userRepository.findByEmailAndPassword(dto.getEmail(), dto.getPassword()).isPresent()) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Benutzer mit dieser E-Mail existiert bereits.");
+            }
 
-        // Prüfen, ob E-Mail schon existiert
-        if (userRepository.findByEmailAndPassword(dto.getEmail(), dto.getPassword()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Benutzer mit dieser E-Mail existiert bereits.");
+            // Adresse finden oder neu anlegen
+            Optional<Address> existing = addressRepository.findByStreetAndPostalCodeAndCity(
+                    dto.getStreet(), dto.getPostalCode(), dto.getCity()
+            );
+
+            Address address = existing.orElseGet(() -> {
+                Address newAddress = new Address();
+                newAddress.setStreet(dto.getStreet());
+                newAddress.setPostalCode(dto.getPostalCode());
+                newAddress.setCity(dto.getCity());
+                return addressRepository.save(newAddress);
+            });
+
+            // Benutzer erstellen
+            User user = new User();
+            user.setFirstname(dto.getFirstname());
+            user.setLastname(dto.getLastname());
+            user.setEmail(dto.getEmail());
+            user.setPassword(dto.getPassword()); // 🔒 später verschlüsseln
+            user.setPhoneNumber(dto.getPhoneNumber());
+            user.setAddress(address);
+            user.setSecret(UUID.randomUUID().toString());
+
+
+            User savedUser = userRepository.save(user);
+
+            return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+        } catch (Exception ex) {
+            ex.printStackTrace(); // ← das brauchen wir!
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Fehler bei der Registrierung: " + ex.getMessage());
         }
-
-        // Adresse finden oder neu anlegen
-        Optional<Address> existing = addressRepository.findByStreetAndPostalCodeAndCity(
-                dto.getStreet(), dto.getPostalCode(), dto.getCity()
-        );
-
-        Address address = existing.orElseGet(() -> {
-            Address newAddress = new Address();
-            newAddress.setStreet(dto.getStreet());
-            newAddress.setPostalCode(dto.getPostalCode());
-            newAddress.setCity(dto.getCity());
-            return addressRepository.save(newAddress);
-        });
-
-        // Benutzer erstellen
-        User user = new User();
-        user.setFirstname(dto.getFirstname());
-        user.setLastname(dto.getLastname());
-        user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword()); // 🔒 später verschlüsseln
-        user.setPhoneNumber(dto.getPhoneNumber());
-        user.setAddress(address);
-        user.setSecret(UUID.randomUUID().toString());
-
-        User savedUser = userRepository.save(user);
-
-        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
     /**
@@ -90,4 +99,10 @@ public class UserController {
 
         return new ResponseEntity<>("Wrong credentials / not found.", HttpStatus.NOT_FOUND);
     }
+
+    @GetMapping("/ping")
+    public ResponseEntity<String> ping() {
+        return ResponseEntity.ok("UserController aktiv ✅");
+    }
+
 }
