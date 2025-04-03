@@ -47,7 +47,4 @@
     -fx-padding: 10;
 }
 
-.error-border {
-    -fx-border-color: red;
-    -fx-border-width: 2px;
-}
+

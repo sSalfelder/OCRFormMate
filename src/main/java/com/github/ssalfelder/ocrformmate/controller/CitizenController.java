@@ -23,6 +23,7 @@ import java.io.IOException;
 @Component
 public class CitizenController {
 
+    //TODO Registrierungsbutton auch schon auf jener UI
     @Autowired
     private OcrAssignmentService ocrAssignmentService;
 

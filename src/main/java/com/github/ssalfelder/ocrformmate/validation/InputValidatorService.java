@@ -26,7 +26,7 @@ public class InputValidatorService {
     }
 
     public boolean isValidStreet(String street) {
-        return street != null && street.matches("^[A-Za-zÄäÖöÜüß\\\\-\\\\.\\\\s]{2,40}");
+        return street != null && street.matches("^[\\p{L}0-9 .\\-]{2,50}$");
     }
 
     public boolean isValidHouseNumber(String houseNumber) {

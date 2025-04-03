@@ -37,6 +37,8 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("Benutzer mit dieser E-Mail existiert bereits.");
             }
 
+            String fullStreet = dto.getStreet() + " " + dto.getHouseNumber();
+
             // Adresse finden oder neu anlegen
             Optional<Address> existing = addressRepository.findByStreetAndPostalCodeAndCity(
                     dto.getStreet(), dto.getPostalCode(), dto.getCity()
@@ -44,7 +46,7 @@ public class UserController {
 
             Address address = existing.orElseGet(() -> {
                 Address newAddress = new Address();
-                newAddress.setStreet(dto.getStreet());
+                newAddress.setStreet(fullStreet);
                 newAddress.setPostalCode(dto.getPostalCode());
                 newAddress.setCity(dto.getCity());
                 return addressRepository.save(newAddress);
