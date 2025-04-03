@@ -47,6 +47,18 @@ public class RegistrationCitizenController {
     @Autowired
     private PasswordValidatorService passwordValidator;
 
+    @FXML
+    public void handleBackClick() {
+        loadLoginScene();
+    }
+
+    @FXML
+    public void handleResetClick() {
+        getAllInputFields().forEach(field -> {
+            field.clear();
+            StyleHelper.clearError(field);
+        });
+    }
 
     @FXML
     public void handleRegisterClick() throws Exception {
@@ -159,22 +171,7 @@ public class RegistrationCitizenController {
                         // Wechsel zurück zur Login-Seite
                         Platform.runLater(() -> {
                             DialogHelper.showInfo("Erfolg", "Registrierung abgeschlossen. Du wirst zum Login weitergeleitet.");
-
-                            try {
-                                FXMLLoader loader = new FXMLLoader(getClass().getResource(
-                                        "/com/github/ssalfelder/ocrformmate/fxml/citizen-login.fxml"));
-                                loader.setControllerFactory(clazz -> OcrFormMateApp.getContext().getBean(clazz));
-                                Parent loginRoot = loader.load();
-
-                                Stage stage = (Stage) firstnameField.getScene().getWindow();
-                                Scene scene = new Scene(loginRoot);
-                                scene.getStylesheets().add(getClass().getResource("/CSS/style.css").toExternalForm());
-                                stage.setScene(scene);
-                                stage.setTitle("Login");
-                                stage.show();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                            loadLoginScene();
                         });
 
                     } else {
@@ -188,4 +185,36 @@ public class RegistrationCitizenController {
                 });
     }
 
+    private void loadLoginScene() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                    "/com/github/ssalfelder/ocrformmate/fxml/citizen-login.fxml"));
+            loader.setControllerFactory(clazz -> OcrFormMateApp.getContext().getBean(clazz));
+            Parent loginRoot = loader.load();
+
+            Stage stage = (Stage) firstnameField.getScene().getWindow();
+            Scene scene = new Scene(loginRoot);
+            scene.getStylesheets().add(getClass().getResource("/CSS/login.css").toExternalForm());
+            stage.setScene(scene);
+            stage.setTitle("Login");
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace(); // Optional: DialogHelper.showError(...)
+        }
+    }
+
+    private List<TextInputControl> getAllInputFields() {
+        return List.of(
+                firstnameField,
+                lastnameField,
+                postalCodeField,
+                streetField,
+                houseNumberField,
+                cityField,
+                phoneField,
+                emailField,
+                passwordField,
+                confirmPasswordField
+        );
+    }
 }

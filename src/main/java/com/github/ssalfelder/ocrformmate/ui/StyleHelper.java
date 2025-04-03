@@ -12,4 +12,9 @@ public class StyleHelper {
         control.textProperty().addListener((obs, oldVal, newVal) ->
                 control.getStyleClass().remove("error-border"));
     }
+
+    public static void clearError(TextInputControl control) {
+        control.getStyleClass().remove("error-border");
+    }
+
 }

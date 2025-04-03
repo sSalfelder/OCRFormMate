@@ -12,7 +12,10 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="TOP_CENTER" prefHeight="87.0" prefWidth="479.0" spacing="20.0" style="-fx-background-color: #cdcdcd; -fx-border-radius: 10; -fx-background-radius: 10;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.ssalfelder.ocrformmate.controller.CitizenLoginController">
+<VBox alignment="TOP_CENTER" prefHeight="87.0" prefWidth="479.0" spacing="20.0"
+      xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.github.ssalfelder.ocrformmate.controller.CitizenLoginController"
+      stylesheets="@../../../../../CSS/login.css">
    <padding>
       <Insets bottom="20.0" />
    </padding>
@@ -43,7 +46,7 @@
       <HBox alignment="TOP_CENTER" prefHeight="40.0" prefWidth="439.0" style="-fx-spacing: 20; -fx-alignment: center;">
          <children>
             <Button mnemonicParsing="false" onAction="#citizenLoginClick" text="Login" />
-            <Button layoutX="325.0" layoutY="10.0" mnemonicParsing="false" onAction="#citizenResetClick" text="Reset" />
+            <Button layoutX="325.0" layoutY="10.0" mnemonicParsing="false" onAction="#citizenResetClick" text="Zurücksetzen" />
          </children>
       </HBox>
    </children>
