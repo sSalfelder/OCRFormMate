@@ -1,5 +1,6 @@
 package com.github.ssalfelder.ocrformmate.controller;
 
+import com.github.ssalfelder.ocrformmate.dto.LoginDTO;
 import com.github.ssalfelder.ocrformmate.dto.UserRegistrationDTO;
 import com.github.ssalfelder.ocrformmate.model.Address;
 import com.github.ssalfelder.ocrformmate.model.User;
@@ -90,16 +91,12 @@ public class UserController {
     /**
      * Benutzer anhand von E-Mail + Passwort validieren
      */
-    @GetMapping("/validate")
-    public ResponseEntity<String> validate(@RequestParam("email") String email,
-                                           @RequestParam("password") String password) {
+    @PostMapping("/validate")
+    public ResponseEntity<User> validate(@RequestBody LoginDTO login) {
+        return userRepository.findByEmailAndPassword(login.getEmail(), login.getPassword())
+                .map(user -> new ResponseEntity<>(user, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
-        var validUser = userRepository.findByEmailAndPassword(email, password);
-        if (validUser.isPresent()) {
-            return new ResponseEntity<>("API Secret: " + validUser.get().getSecret(), HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>("Wrong credentials / not found.", HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/ping")

@@ -1,7 +1,14 @@
 package com.github.ssalfelder.ocrformmate.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.ssalfelder.ocrformmate.OcrFormMateApp;
+import com.github.ssalfelder.ocrformmate.auth.CitizenSessionHolder;
+import com.github.ssalfelder.ocrformmate.model.User;
+import com.github.ssalfelder.ocrformmate.ui.DialogHelper;
 import com.github.ssalfelder.ocrformmate.ui.StyleHelper;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -13,6 +20,11 @@ import javafx.stage.Stage;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.Map;
 
 
 @Component
@@ -48,6 +60,71 @@ public class CitizenLoginController {
 
     @FXML
     protected void citizenLoginClick(ActionEvent event) {
+        String email = citizenUsername.getText().trim();
+        String password = citizenPassword.getText().trim();
+
+        if (email.isEmpty() || password.isEmpty()) {
+            DialogHelper.showWarning("Fehlende Eingaben", "Bitte E-Mail-Adresse und Passwort eingeben.");
+            return;
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        String json;
+
+        try {
+            Map<String, String> payload = Map.of(
+                    "email", email,
+                    "password", password
+            );
+            json = mapper.writeValueAsString(payload);
+        } catch (Exception e) {
+            DialogHelper.showError("Fehler", "Login Daten konnten nicht vorbereitet werden.");
+            e.printStackTrace();
+            return;
+        }
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/user/validate"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+
+        HttpClient client = HttpClient.newHttpClient();
+
+        client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenAccept(response -> {
+                    if (response.statusCode() == 200) {
+                        try {
+                            User user = mapper.readValue(response.body(), User.class);
+
+                            CitizenSessionHolder.setUser(user);
+
+                            Platform.runLater(() -> {
+                                Stage stage = (Stage) citizenUsername.getScene().getWindow();
+                                stage.close();
+                            });
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Platform.runLater(() ->
+                                    DialogHelper.showError("Fehler", "Benutzerdaten konnten nicht gelesen werden.")
+                            );
+                        }
+                    } else {
+                        Platform.runLater(() ->
+                                DialogHelper.showWarning("Login fehlgeschlagen", "E-Mail oder Passwort falsch.")
+                        );
+                    }
+                })
+                .exceptionally(e -> {
+                    e.printStackTrace();
+                    Platform.runLater(() ->
+                            DialogHelper.showError("Verbindungsfehler", "Der Server ist nicht erreichbar.")
+                    );
+                    return null;
+                });
 
     }
 

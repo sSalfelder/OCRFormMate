@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.github.ssalfelder.ocrformmate.init.OpenCvLoader;
 import com.github.ssalfelder.ocrformmate.service.*;
+import com.github.ssalfelder.ocrformmate.session.OcrSessionHolder;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -36,6 +37,7 @@ public class OcrController {
     private final PdfConverterService pdfConverterService;
     private final ImageScalerService imageScalerService;
     private final OcrService ocrService;
+    private final CitizenController citizenController;
 
     @Autowired
     public OcrController(OcrResultService ocrResultService,
@@ -43,14 +45,17 @@ public class OcrController {
                          FormFieldService formFieldDetectionService,
                          AlignmentAnalyzer alignmentAnalyzer,
                          PdfConverterService pdfConverterService,
-                         ImageScalerService imageScalerService){
+                         ImageScalerService imageScalerService,
+                         OcrService ocrservice,
+                         CitizenController citizenController){
         this.ocrResultService = ocrResultService;
         this.documentAlignmentService = documentAlignmentService;
         this.formFieldDetectionService = formFieldDetectionService;
         this.alignmentAnalyzer = alignmentAnalyzer;
         this.pdfConverterService = pdfConverterService;
         this.imageScalerService = imageScalerService;
-        this.ocrService = new OcrService();
+        this.citizenController = citizenController;
+        this.ocrService = ocrservice;
     }
     @FXML
     private ComboBox<String> formTypeComboBox;
@@ -63,7 +68,7 @@ public class OcrController {
     @FXML
     private ImageView imageView;
 
-    private final String[] FORMTYPE = {"Auto", "Buergergeld", "Anmeldung"};
+    private final String[] FORMTYPE = {"Buergergeld", "Anmeldung"};
     private double scale = 1.0;
     private double mouseAnchorX;
     private double mouseAnchorY;
@@ -142,7 +147,7 @@ public class OcrController {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {
-                runOcrWorkflow(selectedFile, formType); // das ist deine OCR-Logik
+                runOcrWorkflow(selectedFile, formType);
                 return null;
             }
 
@@ -198,8 +203,13 @@ public class OcrController {
         Platform.runLater(() -> {
             imageView.setImage(image);
             resultTextArea.setText(resultBuilder.toString());
+
+            OcrSessionHolder.set(resultBuilder.toString());
+            OcrSessionHolder.setFormType(formType);
             ocrResultService.saveOcrResult(resultBuilder.toString());
             printImageResolution(image);
+
+            citizenController.enableSubmitIfOcrAvailable();
         });
     }
 

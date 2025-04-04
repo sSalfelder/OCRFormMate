@@ -5,6 +5,8 @@ import com.github.ssalfelder.ocrformmate.auth.CitizenSessionHolder;
 import com.github.ssalfelder.ocrformmate.model.User;
 import com.github.ssalfelder.ocrformmate.service.CitizenService;
 import com.github.ssalfelder.ocrformmate.service.OcrAssignmentService;
+import com.github.ssalfelder.ocrformmate.session.OcrSessionHolder;
+import com.github.ssalfelder.ocrformmate.ui.DialogHelper;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -23,7 +25,18 @@ import java.io.IOException;
 @Component
 public class CitizenController {
 
-    //TODO Registrierungsbutton auch schon auf jener UI
+    //TODO Eingeloggt als ... einrichten
+    //TODO Verzeichnisstruktur zum Datei öffnen implementieren
+    //TODO Logout Button
+    //TODO Login Button schon im Hauptfenster
+    //TODO Ausgabefenster mit dem zu beschreibenden Formular
+    //TODO separate Ladeleiste für Ausgabe
+    //TODO eingereicht am Zeitstempel auch im DialogHelper Fenster
+    //TODO mehrseitiges PDF (ganzer Bürgergeldantrag)
+    //TODO Nochmal nachfragen vor dem Abschicken
+
+    //TODO Clerkseite einrichten + zusätzliche Features
+    //TODO Weboberfläche zum Auslesen einrichten
     @Autowired
     private OcrAssignmentService ocrAssignmentService;
 
@@ -36,18 +49,25 @@ public class CitizenController {
     @Autowired
     private CitizenService citizenService;
 
-    // Beispiel: dieses Textfeld bekommst du vermutlich aus OcrController via Getter/Injection
-    @FXML
-    private TextArea resultTextArea;
-
     private final String[] AUTHORITY = {"Jobcenter", "Meldeamt"};
-
-    private int currentUserId = 1; // später: dynamisch setzen nach Login
 
     @FXML
     public void initialize() {
         citizenAuthorityChooser.getItems().addAll(AUTHORITY);
         citizenAuthorityChooser.getSelectionModel().selectFirst();
+
+        citizenOCRSubmitButton.setDisable(!OcrSessionHolder.isAvailable());
+
+        String type = OcrSessionHolder.getFormType();
+        if ("Buergergeld".equals(type)) {
+            citizenAuthorityChooser.getSelectionModel().select("Jobcenter");
+            citizenAuthorityChooser.setDisable(true);
+        } else if ("Anmeldung".equals(type)) {
+            citizenAuthorityChooser.getSelectionModel().select("Meldeamt");
+            citizenAuthorityChooser.setDisable(true);
+        } else {
+            citizenAuthorityChooser.setDisable(false);
+        }
     }
 
     @FXML
@@ -77,7 +97,7 @@ public class CitizenController {
             }
         }
 
-        String text = resultTextArea.getText();
+        String text = OcrSessionHolder.get();
         String authority = citizenAuthorityChooser.getValue();
 
         if (text == null || text.isBlank()) {
@@ -87,10 +107,23 @@ public class CitizenController {
 
         try {
             User user = CitizenSessionHolder.getUser();
-            ocrAssignmentService.saveForUser(text, user.getId(), authority);
+            int userId = user.getId();
+            ocrAssignmentService.saveForUser(text, userId, authority);
             System.out.println("OCR gespeichert für User " + user.getId() + " mit Behörde: " + authority);
+            DialogHelper.showInfo("Erfolg", "Die Formulardaten wurden erfolgreich übermittelt.");
         } catch (Exception e) {
             System.err.println("Fehler beim Speichern: " + e.getMessage());
         }
     }
+
+    public void enableSubmitIfOcrAvailable() {
+        citizenOCRSubmitButton.setDisable(!OcrSessionHolder.isAvailable());
+
+        String formType = OcrSessionHolder.getFormType();
+        if ("Buergergeld".equals(formType)) {
+            citizenAuthorityChooser.getSelectionModel().select("Jobcenter");
+            citizenAuthorityChooser.setDisable(true);
+        }
+    }
+
 }
