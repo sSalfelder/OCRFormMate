@@ -20,6 +20,7 @@ import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.swing.*;
 import java.io.IOException;
 
 @Component
@@ -37,6 +38,7 @@ public class CitizenController {
 
     //TODO Clerkseite einrichten + zusätzliche Features
     //TODO Weboberfläche zum Auslesen einrichten
+    //TODO Neue Generierung zu Vornamen und neue Datensätze
     @Autowired
     private OcrAssignmentService ocrAssignmentService;
 
@@ -71,31 +73,13 @@ public class CitizenController {
     }
 
     @FXML
+    protected void onCitizenLogin(ActionEvent event) {
+        loadLoginMask();
+    }
+
+    @FXML
     protected void onCitizenOCRSubmit(ActionEvent event) {
-        if (!CitizenSessionHolder.isLoggedIn()) {
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/github/ssalfelder/ocrformmate/" +
-                        "fxml/citizen-login.fxml"));
-                loader.setControllerFactory(clazz -> OcrFormMateApp.getContext().getBean(clazz));
-                Parent loginRoot = loader.load();
-
-                Stage stage = new Stage();
-                stage.setScene(new Scene(loginRoot));
-                stage.setTitle("Login erforderlich");
-                stage.initModality(Modality.APPLICATION_MODAL); // blockiert andere Fenster
-                stage.showAndWait();
-
-                // Prüfen ob Login nach Dialog erfolgt ist
-                if (!CitizenSessionHolder.isLoggedIn()) {
-                    System.out.println("Login wurde abgebrochen.");
-                    return;
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                return;
-            }
-        }
+        loadLoginMask();
 
         String text = OcrSessionHolder.get();
         String authority = citizenAuthorityChooser.getValue();
@@ -126,4 +110,30 @@ public class CitizenController {
         }
     }
 
+    protected void loadLoginMask() {
+        if (!CitizenSessionHolder.isLoggedIn()) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/github/ssalfelder/ocrformmate/" +
+                        "fxml/citizen-login.fxml"));
+                loader.setControllerFactory(clazz -> OcrFormMateApp.getContext().getBean(clazz));
+                Parent loginRoot = loader.load();
+
+                Stage stage = new Stage();
+                stage.setScene(new Scene(loginRoot));
+                stage.setTitle("Login erforderlich");
+                stage.initModality(Modality.APPLICATION_MODAL); // blockiert andere Fenster
+                stage.showAndWait();
+
+                // Prüfen ob Login nach Dialog erfolgt ist
+                if (!CitizenSessionHolder.isLoggedIn()) {
+                    System.out.println("Login wurde abgebrochen.");
+                    return;
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+        }
+    }
 }
