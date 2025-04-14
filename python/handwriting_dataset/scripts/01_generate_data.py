@@ -7,7 +7,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 from tqdm import tqdm
 import json
 
-# === Konfiguration ===
+# Konfiguration
 FIELD_NAME = "vorname"
 FIELD_SIZE = (852, 91)  # Originale Größe vor Padding
 FINAL_SIZE = (384, 384)  # Zielgröße für Modell
@@ -21,24 +21,24 @@ JSONL_PATH = BASE_OUTPUT_DIR / "dataset.jsonl"
 FONT_DIR = BASE_DIR.parent / "fonts"
 DICT_PATH = BASE_DIR.parent / "dictionaries/vornamen.json"
 
-# === Setup ===
+# Setup
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 os.makedirs(JSONL_PATH.parent, exist_ok=True)
 
-# === prepare_image Funktion ===
+# prepare_image Funktion
 def prepare_image(image: Image.Image, size=(384, 384)) -> Image.Image:
     return ImageOps.pad(image, size, color="white", centering=(0.5, 0.5), method=Image.BICUBIC)
 
-# === Datenquelle: Vornamen laden ===
+# Datenquelle: Vornamen laden
 with open(DICT_PATH, "r", encoding="utf-8") as f:
     name_list = json.load(f)
 
-# === Fonts laden ===
+# Fonts laden
 fonts = list(FONT_DIR.glob("*.ttf"))
 if not fonts:
     raise RuntimeError(f"Keine .ttf-Dateien im Font-Verzeichnis gefunden: {FONT_DIR}")
 
-# === Bild- und JSONL-Erzeugung ===
+# Bild- und JSONL-Erzeugung
 with open(JSONL_PATH, "w", encoding="utf-8") as jsonl_file:
     for i in tqdm(range(NUM_IMAGES), desc="Generiere Handschriftbilder"):
         name = random.choice(name_list)

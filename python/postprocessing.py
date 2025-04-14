@@ -5,7 +5,6 @@ from rapidfuzz import process, fuzz
 
 DICTIONARY_DIR = "dictionaries"
 
-# Cache: Lädt JSON beim ersten Zugriff, danach aus Speicher
 @lru_cache(maxsize=32)
 def load_dictionary(form_type: str) -> dict:
     path = os.path.join(DICTIONARY_DIR, f"{form_type}.json")
@@ -32,6 +31,6 @@ def postprocess_all(results: dict, form_type: str = "default") -> dict:
         if isinstance(value, str) and isinstance(values, list):
             corrected[field_name] = fuzzy_correct(value, values)
         else:
-            corrected[field_name] = value  # Keine Korrektur notwendig
+            corrected[field_name] = value
 
     return corrected

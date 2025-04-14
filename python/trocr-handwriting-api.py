@@ -6,15 +6,12 @@ import torch
 
 app = Flask(__name__)
 
-# Lokaler Modellpfad
 LOCAL_MODEL_PATH = "./models/fhswf_trocr"
 
-# Modell und Prozessor laden (nur lokal)
 processor = TrOCRProcessor.from_pretrained(LOCAL_MODEL_PATH, local_files_only=True)
 model = VisionEncoderDecoderModel.from_pretrained(LOCAL_MODEL_PATH, local_files_only=True)
 model.eval()
 
-# Neue, empfohlene Generierungskonfiguration
 generation_config = GenerationConfig.from_pretrained(LOCAL_MODEL_PATH, local_files_only=True)
 generation_config.max_length = 64
 

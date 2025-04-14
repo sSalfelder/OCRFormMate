@@ -50,5 +50,18 @@ FOLDER_TO_LABEL = {
     "yY": "Y",
     "yy": "Y",
     "zZ": "Z",
-    "zz": "Z"
+    "zz": "Z",
+    "sZ": "ß",
+    "and": "&",
+    "asterisk": "*",
+    "at": "@",
+    "colon": ":",
+    "comma": ",",
+    "euro": "€",
+    "left_bracket": "(",
+    "right_bracket": ")",
+    "minus": "-",
+    "plus": "+",
+    "point": ".",
+    "slash": "/"
 }

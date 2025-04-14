@@ -1,4 +1,4 @@
-import os
+
 from pathlib import Path
 from PIL import Image
 from tqdm import tqdm
@@ -6,23 +6,18 @@ import shutil
 from transformers import TrOCRProcessor, VisionEncoderDecoderModel
 import torch
 
-# === 🔧 Konfigurierbare Parameter ===
-TARGET_LETTER = "I"  # <-- das ist die erkannte Prediction, z. B. "O", "B", "I"
-SOURCE_DIR = Path(f"D:/dataset/{TARGET_LETTER.lower()}")  # z. B. "d:/dataset/o"
-TARGET_DIR = Path(f"D:/dataset/{TARGET_LETTER.lower()}{TARGET_LETTER}")  # z. B. "d:/dataset/oO"
+TARGET_LETTER = "I"
+SOURCE_DIR = Path(f"D:/dataset/{TARGET_LETTER.lower()}")
+TARGET_DIR = Path(f"D:/dataset/{TARGET_LETTER.lower()}{TARGET_LETTER}")
 
-# Lokaler Modellpfad
 LOCAL_MODEL_PATH = "../../models/fhswf_trocr"
 
-# Modell und Prozessor laden (nur lokal)
 processor = TrOCRProcessor.from_pretrained(LOCAL_MODEL_PATH, local_files_only=True)
 model = VisionEncoderDecoderModel.from_pretrained(LOCAL_MODEL_PATH, local_files_only=True)
 model.eval()
 
-# === Zielordner vorbereiten
 TARGET_DIR.mkdir(parents=True, exist_ok=True)
 
-# === Alle Bilder durchgehen
 image_paths = sorted(SOURCE_DIR.glob("*.png"))[:100]
 print(f"{len(image_paths)} Bilder gefunden in '{SOURCE_DIR}' – Ziel: {TARGET_LETTER}")
 
