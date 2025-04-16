@@ -12,7 +12,7 @@ public class UserRegistrationDTO {
     private String postalCode;
     private String city;
 
-    // Getter & Setter
+
     public String getFirstname() { return firstname; }
     public void setFirstname(String firstname) { this.firstname = firstname; }
 
@@ -40,4 +40,8 @@ public class UserRegistrationDTO {
 
     public String getCity() { return city; }
     public void setCity(String city) { this.city = city; }
+
+    public void setHouseNumber(String houseNumber) {
+        this.houseNumber = houseNumber;
+    }
 }

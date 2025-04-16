@@ -168,7 +168,6 @@ public class RegistrationCitizenController {
                     if (response.statusCode() == 201) {
                         System.out.println("Registrierung erfolgreich!");
 
-                        // Wechsel zurück zur Login-Seite
                         Platform.runLater(() -> {
                             DialogHelper.showInfo("Erfolg", "Registrierung abgeschlossen. Du wirst zum Login weitergeleitet.");
                             loadLoginScene();
@@ -179,7 +178,9 @@ public class RegistrationCitizenController {
                                 DialogHelper.showError("Registrierung fehlgeschlagen",
                                 "Serverantwort: " + response.body())
                         );
-                        System.out.println("Serverantwort: " + response.body());
+                        System.out.println(">>> StatusCode: " + response.statusCode());
+                        System.out.println(">>> Body: " + response.body());
+                        System.out.println(">>> Full Response: " + response);
 
                     }
                 });
@@ -199,7 +200,7 @@ public class RegistrationCitizenController {
             stage.setTitle("Login");
             stage.show();
         } catch (IOException e) {
-            e.printStackTrace(); // Optional: DialogHelper.showError(...)
+            e.printStackTrace();
         }
     }
 
