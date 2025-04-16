@@ -1,6 +1,6 @@
 package com.github.ssalfelder.ocrformmate.dto;
 
-public class LoginDTO {
+public class UserLoginDTO {
     private String email;
     private String password;
 
