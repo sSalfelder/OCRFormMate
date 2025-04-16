@@ -21,13 +21,14 @@
             <HBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
                 <fx:include source="ocrPane.fxml" />
             </HBox>
-            <GridPane alignment="CENTER" hgap="20">
+            <GridPane alignment="CENTER" hgap="50">
                 <Button text="Anmelden" onAction="#onCitizenLogin" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                <Label text="Senden an" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="0"  />
-                <ComboBox fx:id="citizenAuthorityChooser" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <Label fx:id="loginStatusLabel" text="Nicht angemeldet" maxHeight="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <Label text="Senden an" maxHeight="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="0"  />
+                <ComboBox fx:id="citizenAuthorityChooser" prefWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                 <Button fx:id="citizenOCRSubmitButton" text="Senden" onAction="#onCitizenOCRSubmit" maxHeight="Infinity"
-                        GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                <Button text="Abmelden" onAction="#onCitizenLogin" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                        GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                <Button text="Abmelden" onAction="#onCitizenLogout" GridPane.columnIndex="4" GridPane.rowIndex="1" />
             </GridPane>
         </VBox>
     </content>

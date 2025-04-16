@@ -13,6 +13,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.event.ActionEvent;
 import javafx.stage.Modality;
@@ -20,21 +21,16 @@ import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.swing.*;
 import java.io.IOException;
 
 @Component
 public class CitizenController {
 
-    //TODO Eingeloggt als ... einrichten
-    //TODO Verzeichnisstruktur zum Datei öffnen implementieren
-    //TODO Logout Button
-    //TODO Login Button schon im Hauptfenster
+    //TODO Benutzername statt Email
     //TODO Ausgabefenster mit dem zu beschreibenden Formular
-    //TODO separate Ladeleiste für Ausgabe
+    //TODO Ladeleiste in eine Richtung gehend (nicht hin und her)
     //TODO eingereicht am Zeitstempel auch im DialogHelper Fenster
     //TODO mehrseitiges PDF (ganzer Bürgergeldantrag)
-    //TODO Nochmal nachfragen vor dem Abschicken
 
     //TODO Clerkseite einrichten + zusätzliche Features
     //TODO Weboberfläche zum Auslesen einrichten
@@ -46,6 +42,9 @@ public class CitizenController {
     private ComboBox<String> citizenAuthorityChooser;
 
     @FXML
+    private Label loginStatusLabel;
+
+    @FXML
     private Button citizenOCRSubmitButton;
 
     @Autowired
@@ -55,6 +54,7 @@ public class CitizenController {
 
     @FXML
     public void initialize() {
+        updateLoginStatusLabel();
         citizenAuthorityChooser.getItems().addAll(AUTHORITY);
         citizenAuthorityChooser.getSelectionModel().selectFirst();
 
@@ -72,9 +72,25 @@ public class CitizenController {
         }
     }
 
+    private void updateLoginStatusLabel() {
+        if (CitizenSessionHolder.isLoggedIn()) {
+            User user = CitizenSessionHolder.getUser();
+            loginStatusLabel.setText("🟢 Angemeldet als: " + user.getEmail());
+        } else {
+            loginStatusLabel.setText("🔴 Nicht angemeldet");
+        }
+    }
+
     @FXML
     protected void onCitizenLogin(ActionEvent event) {
         loadLoginMask();
+    }
+
+    @FXML
+    protected void onCitizenLogout(ActionEvent event) {
+        CitizenSessionHolder.clear();
+        updateLoginStatusLabel();
+        DialogHelper.showInfo("Abgemeldet", "Sie wurden erfolgreich abgemeldet.");
     }
 
     @FXML
@@ -113,8 +129,8 @@ public class CitizenController {
     protected void loadLoginMask() {
         if (!CitizenSessionHolder.isLoggedIn()) {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/github/ssalfelder/ocrformmate/" +
-                        "fxml/citizen-login.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                        "/com/github/ssalfelder/ocrformmate/fxml/citizen-login.fxml"));
                 loader.setControllerFactory(clazz -> OcrFormMateApp.getContext().getBean(clazz));
                 Parent loginRoot = loader.load();
 
@@ -130,10 +146,15 @@ public class CitizenController {
                     return;
                 }
 
+                // Nach erfolgreichem Login Statuslabel aktualisieren
+                updateLoginStatusLabel();
+                DialogHelper.showInfo("Login erfolgreich", "Sie sind nun angemeldet als:\n" +
+                        CitizenSessionHolder.getUser().getEmail());
+
             } catch (IOException e) {
                 e.printStackTrace();
-                return;
             }
         }
     }
+
 }
