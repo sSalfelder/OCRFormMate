@@ -5,6 +5,9 @@
 <?import javafx.scene.layout.*?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.text.TextFlow?>
+<?import javafx.scene.web.WebView?>
 <VBox xmlns="http://javafx.com/javafx/23.0.1"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.github.ssalfelder.ocrformmate.controller.OcrController" spacing="10"
@@ -18,6 +21,8 @@
             <children>
                 <ComboBox fx:id="formTypeComboBox" prefWidth="150.0" maxHeight="Infinity"/>
                 <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="fileOpener" text="Datei öffnen" onAction="#onfileOpenerClicked" maxHeight="Infinity"/>
+                <Region HBox.hgrow="ALWAYS"/>
                 <Button fx:id="ocrButton" text="OCR ausführen" onAction="#onOcrButtonClicked" maxHeight="Infinity"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <ProgressBar fx:id="progressBar" prefWidth="150.0" progress="0.0" visible="true" maxHeight="Infinity"/>
@@ -28,14 +33,21 @@
         <SplitPane dividerPositions="0.5" VBox.vgrow="ALWAYS">
             <items>
                 <!-- Bildanzeige mit Scrollfunktion -->
-                <ScrollPane fitToWidth="true" fitToHeight="true">
+                <ScrollPane fx:id="imageScrollPane">
                     <content>
-                        <ImageView fx:id="imageView" preserveRatio="true" pickOnBounds="true"/>
+                        <!-- Group statt StackPane, damit keine automatische Zentrierung -->
+                        <Group>
+                            <ImageView fx:id="imageView"
+                                       preserveRatio="true"
+                                       pickOnBounds="true"/>
+                        </Group>
                     </content>
                 </ScrollPane>
 
-                <!-- OCR Ergebnis -->
-                <TextArea fx:id="resultTextArea" wrapText="true"/>
+                <TextFlow fx:id="resultTextFlow"
+                          VBox.vgrow="ALWAYS"/>
+
+                <WebView fx:id="pdfWebView" />
             </items>
         </SplitPane>
     </children>

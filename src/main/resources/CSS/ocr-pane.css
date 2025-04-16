@@ -7,13 +7,16 @@
 
 /* Buttons */
 .button {
-    -fx-background-color: #4CAF50;
-    -fx-text-fill: white;
     -fx-padding: 6 12;
     -fx-background-radius: 5;
     -fx-cursor: hand;
 }
-.button:hover {
+
+#ocrButton {
+        -fx-background-color: #4CAF50;
+        -fx-text-fill: white;
+}
+#ocrButton:hover {
     -fx-background-color: #45a049;
 }
 
