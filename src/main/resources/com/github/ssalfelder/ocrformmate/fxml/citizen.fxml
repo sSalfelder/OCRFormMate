@@ -13,12 +13,12 @@
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.github.ssalfelder.ocrformmate.controller.CitizenController">
     <content>
-        <VBox alignment="TOP_CENTER" fillWidth="true" spacing="20.0">
+        <VBox alignment="TOP_CENTER" spacing="20.0">
             <padding>
                 <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
             </padding>
             <!-- OCR-Bereich mit Platzbedarf -->
-            <HBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+            <HBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" alignment="CENTER">
                 <fx:include source="ocrPane.fxml" />
             </HBox>
             <GridPane alignment="CENTER" hgap="50">

@@ -38,7 +38,7 @@ public class HandwritingClient {
         HttpClient httpClient = HttpClient.newHttpClient();
         ObjectMapper mapper = new ObjectMapper();
 
-        // 1. JSON für Feldkoordinaten erzeugen
+        // JSON für Feldkoordinaten erzeugen
         Map<String, int[]> jsonFields = new HashMap<>();
         for (Map.Entry<String, Rect> entry : fields.entrySet()) {
             Rect r = entry.getValue();
@@ -46,7 +46,7 @@ public class HandwritingClient {
         }
         String fieldsJson = mapper.writeValueAsString(jsonFields);
 
-        // 2. Multipart-Request vorbereiten
+        // Multipart-Request vorbereiten
         String boundary = "----OCRBoundary1234";
         String part1 = "--" + boundary + "\r\n"
                 + "Content-Disposition: form-data; name=\"image\"; filename=\"" + imageFile.getName() + "\"\r\n"
@@ -67,7 +67,7 @@ public class HandwritingClient {
         body.write(part3.getBytes());
         body.write(part4.getBytes());
 
-        // 3. Anfrage an den neuen OCR-Endpoint
+        // Anfrage an den neuen OCR-Endpoint
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create("http://localhost:6000/handwriting/recognizeFields"))
             .header("Content-Type", "multipart/form-data; boundary=" + boundary)
@@ -77,7 +77,7 @@ public class HandwritingClient {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() == 200) {
-            // 4. JSON → Map<String, String>
+            // JSON → Map<String, String>
             return mapper.readValue(response.body(), new TypeReference<Map<String, String>>() {});
         } else {
             throw new RuntimeException("OCR error: HTTP " + response.statusCode());

@@ -30,7 +30,6 @@ import java.util.Map;
 @Component
 public class CitizenLoginController {
 
-    //TODO Login Untätigkeit bei falscher Dateineingabe beheben
     @FXML
     private TextField citizenUsername;
     @FXML
@@ -38,7 +37,6 @@ public class CitizenLoginController {
 
     @FXML
     protected void goBack(ActionEvent event) {
-        // Fenster (Stage) über das Event schließen
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.close();
     }

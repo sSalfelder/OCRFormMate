@@ -3,52 +3,47 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
+<?import org.fxmisc.richtext.StyleClassedTextArea?>
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Group?>
-<?import javafx.scene.text.TextFlow?>
 <?import javafx.scene.web.WebView?>
+
 <VBox xmlns="http://javafx.com/javafx/23.0.1"
-      xmlns:fx="http://javafx.com/fxml/1"
+      xmlns:fx="http://javafx.com/fxml/"
       fx:controller="com.github.ssalfelder.ocrformmate.controller.OcrController" spacing="10"
-      stylesheets="@../../../../../CSS/ocr-pane.css">
+      stylesheets="@../../../../../CSS/ocr-pane.css" alignment="CENTER">
     <padding>
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
-    <children>
-        <!-- Obere Steuerleiste -->
-        <HBox spacing="10.0">
-            <children>
-                <ComboBox fx:id="formTypeComboBox" prefWidth="150.0" maxHeight="Infinity"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Button fx:id="fileOpener" text="Datei öffnen" onAction="#onfileOpenerClicked" maxHeight="Infinity"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Button fx:id="ocrButton" text="OCR ausführen" onAction="#onOcrButtonClicked" maxHeight="Infinity"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <ProgressBar fx:id="progressBar" prefWidth="150.0" progress="0.0" visible="true" maxHeight="Infinity"/>
-            </children>
-        </HBox>
+    <!-- Obere Steuerleiste -->
+    <HBox spacing="10.0" alignment="CENTER">
+        <ComboBox fx:id="formTypeComboBox" prefWidth="150.0" maxHeight="Infinity"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="fileOpener" text="Datei öffnen" onAction="#onfileOpenerClicked" maxHeight="Infinity"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="ocrButton" text="OCR ausführen" onAction="#onOcrButtonClicked" maxHeight="Infinity"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <ProgressBar fx:id="progressBar" prefWidth="150.0" progress="0.0" visible="true" maxHeight="Infinity"/>
+    </HBox>
 
-        <!-- Hauptinhalt: Bild und OCR-Text nebeneinander -->
-        <SplitPane dividerPositions="0.5" VBox.vgrow="ALWAYS">
-            <items>
-                <!-- Bildanzeige mit Scrollfunktion -->
-                <ScrollPane fx:id="imageScrollPane">
-                    <content>
-                        <!-- Group statt StackPane, damit keine automatische Zentrierung -->
-                        <Group>
-                            <ImageView fx:id="imageView"
-                                       preserveRatio="true"
-                                       pickOnBounds="true"/>
-                        </Group>
-                    </content>
-                </ScrollPane>
+    <SplitPane dividerPositions="0.5" VBox.vgrow="ALWAYS">
+        <items>
+            <ScrollPane fx:id="imageScrollPane">
+                <content>
+                    <Group>
+                        <ImageView fx:id="imageView"
+                                   preserveRatio="true"
+                                   pickOnBounds="true"/>
+                    </Group>
+                </content>
+            </ScrollPane>
 
-                <TextFlow fx:id="resultTextFlow"
-                          VBox.vgrow="ALWAYS"/>
+            <org.fxmisc.richtext.StyleClassedTextArea fx:id="styledArea"
+                                                      wrapText="true"
+                                                      VBox.vgrow="ALWAYS"/>
 
-                <WebView fx:id="pdfWebView" />
-            </items>
-        </SplitPane>
-    </children>
+            <WebView fx:id="pdfWebView"/>
+        </items>
+    </SplitPane>
 </VBox>

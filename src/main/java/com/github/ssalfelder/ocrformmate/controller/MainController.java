@@ -19,10 +19,6 @@ public class MainController {
     private Scene scene;
     private Parent root;
 
-    @FXML
-    private ComboBox<String> citizenAuthorityChooser;
-
-    // Combobox für die Bürger Scene
     private final String[] FORMTYPE = {"Jobcenter", "Meldeamt"};
 
     @FXML

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.ssalfelder.ocrformmate.OcrFormMateApp;
 import com.github.ssalfelder.ocrformmate.ui.DialogHelper;
 import com.github.ssalfelder.ocrformmate.ui.StyleHelper;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

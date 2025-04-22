@@ -2,25 +2,26 @@ package com.github.ssalfelder.ocrformmate.controller;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.text.Normalizer;
 import java.util.Map;
 
 import com.github.ssalfelder.ocrformmate.init.OpenCvLoader;
 import com.github.ssalfelder.ocrformmate.service.*;
 import com.github.ssalfelder.ocrformmate.session.OcrSessionHolder;
 import com.github.ssalfelder.ocrformmate.ui.DialogHelper;
+import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
+import org.fxmisc.richtext.StyleClassedTextArea;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -29,12 +30,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.bytedeco.opencv.opencv_core.Mat;
 import static org.bytedeco.opencv.global.opencv_imgcodecs.*;
-import javafx.animation.PauseTransition;
+
 import javafx.util.Duration;
 
-
-
-import javax.print.Doc;
 
 @Component
 public class OcrController {
@@ -46,7 +44,6 @@ public class OcrController {
     private final PdfConverterService pdfConverterService;
     private final ImageScalerService imageScalerService;
     private final OcrService ocrService;
-    private final CitizenController citizenController;
     private final ImageDisplayService imageDisplayService;
 
     @Autowired
@@ -57,7 +54,6 @@ public class OcrController {
                          PdfConverterService pdfConverterService,
                          ImageScalerService imageScalerService,
                          OcrService ocrservice,
-                         CitizenController citizenController,
                          ImageDisplayService imageDisplayService) {
         this.ocrResultService = ocrResultService;
         this.documentAlignmentService = documentAlignmentService;
@@ -65,7 +61,6 @@ public class OcrController {
         this.alignmentAnalyzer = alignmentAnalyzer;
         this.pdfConverterService = pdfConverterService;
         this.imageScalerService = imageScalerService;
-        this.citizenController = citizenController;
         this.ocrService = ocrservice;
         this.imageDisplayService = imageDisplayService;
     }
@@ -77,13 +72,13 @@ public class OcrController {
     @FXML
     private ProgressBar progressBar;
     @FXML
-    private TextFlow resultTextFlow;
-    @FXML
     private ImageView imageView;
     @FXML
     private WebView pdfWebView;
     @FXML
     private ScrollPane imageScrollPane;
+    @FXML
+    private StyleClassedTextArea styledArea;
 
     private final String[] FORMTYPE = {"Buergergeld", "Anmeldung"};
     private double scale = 1.0;
@@ -92,11 +87,26 @@ public class OcrController {
     private double translateAnchorX;
     private double translateAnchorY;
     private File selectedFile = null;
+    private  CitizenController citizenController;
+    private Timeline progressTimeline;
+    private final javafx.scene.text.Font ocrFont = javafx.scene.text.Font.loadFont(
+            getClass().getResourceAsStream("/fonts/Roboto-Regular.ttf"), 14
+    );
+
+
+    public  void setCitizenController(CitizenController citizenController) {
+        this.citizenController = citizenController;
+    }
 
     @FXML
     private void initialize() {
         formTypeComboBox.getItems().addAll(FORMTYPE);
         formTypeComboBox.getSelectionModel().selectFirst();
+
+        formTypeComboBox.setOnAction(event -> {
+            String selectedType = formTypeComboBox.getSelectionModel().getSelectedItem();
+            citizenController.updateAuthorityBasedOnFormType(selectedType);
+        });
 
         Platform.runLater(() -> {
             Stage stage = (Stage) imageView.getScene().getWindow();
@@ -151,7 +161,7 @@ public class OcrController {
         if (selectedFile != null) {
             String name = selectedFile.getName().toLowerCase();
             if (!(name.endsWith(".png") || name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".pdf"))) {
-                showMessageInTextFlow("Ungültiges Format. Bitte wählen Sie PNG, JPG oder PDF.", "red");
+                showMessageInStyledArea("Ungültiges Format. Bitte wählen Sie PNG, JPG oder PDF.", "styled-error");
             } else {
                 showImageWithoutOcr(selectedFile);
             }
@@ -169,7 +179,7 @@ public class OcrController {
         if (selectedFile != null) {
             startOcrTask(selectedFile, formType);
         } else {
-            showMessageInTextFlow("Keine Datei ausgewählt.", "black");
+            showMessageInStyledArea("Keine Datei ausgewählt.", "styled-default");
         }
     }
 
@@ -181,7 +191,13 @@ public class OcrController {
 
     private void startOcrTask(File selectedFile, String formType) {
         progressBar.setVisible(true);
-        progressBar.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS); // animierter Balken
+        progressTimeline = new Timeline(
+                new KeyFrame(Duration.ZERO, new KeyValue(progressBar.progressProperty(), 0)),
+                new KeyFrame(Duration.seconds(2), new KeyValue(progressBar.progressProperty(), 1))
+        );
+        progressTimeline.setCycleCount(Animation.INDEFINITE);
+        progressTimeline.play();
+
 
         Task<Void> task = new Task<>() {
             @Override
@@ -192,7 +208,11 @@ public class OcrController {
 
             @Override
             protected void succeeded() {
+                if (progressTimeline != null) {
+                    progressTimeline.stop();
+                }
                 progressBar.setVisible(false);
+                progressBar.setProgress(0);
             }
 
             @Override
@@ -221,7 +241,7 @@ public class OcrController {
 
         if (!success) {
             Platform.runLater(() -> {
-                showMessageInTextFlow("Fehler bei der Dokument-Ausrichtung.", "red");
+                showMessageInStyledArea("Fehler bei der Dokument-Ausrichtung.", "styled-error");
             });
             return;
         }
@@ -274,7 +294,7 @@ public class OcrController {
                 boolean success = imageDisplayService.removeAlphaChannel(inputPath, outputPngPath);
                 if (!success) {
                     Platform.runLater(() -> {
-                        showMessageInTextFlow("Fehler beim Anzeigen der Bilddatei.", "red");
+                        showMessageInStyledArea("Fehler beim Anzeigen der Bilddatei.", "styled-error");
                     });
                 }
             }
@@ -288,7 +308,7 @@ public class OcrController {
                 imageView.setPreserveRatio(true);
                 imageView.setSmooth(false);
 
-                showMessageInTextFlow("Bild geladen. OCR kann jetzt gestartet werden.", "green");
+                showMessageInStyledArea("Bild geladen. OCR kann jetzt gestartet werden.", "styled-info");
 
                 // 3. Fenster ggf. vergrößern + zentrieren
                 Stage stage = (Stage) imageView.getScene().getWindow();
@@ -299,7 +319,6 @@ public class OcrController {
                 // 4. Nach Layout-Pass: Zoom automatisch berechnen
                 PauseTransition pause = new PauseTransition(Duration.millis(100));
                 pause.setOnFinished(e -> {
-                    // Nutze das umschließende StackPane als Referenz
                     if (imageView.getParent() != null) {
                         double containerWidth = imageScrollPane.getViewportBounds().getWidth();
                         double containerHeight = imageScrollPane.getViewportBounds().getHeight();
@@ -323,29 +342,51 @@ public class OcrController {
         } catch (Exception e) {
             e.printStackTrace();
             Platform.runLater(() -> {
-                showMessageInTextFlow("Fehler beim Anzeigen der Bilddatei.", "red");
+                showMessageInStyledArea("Fehler beim Anzeigen der Bilddatei.", "styled-error");
             });
         }
     }
 
     private void showFormattedOcrResult(Map<String, String> ocrResult) {
-        resultTextFlow.getChildren().clear();
+        styledArea.clear();
+        final double[] maxWidth = {0};
 
         ocrResult.forEach((key, value) -> {
-            Text field = new Text("[" + key + "]: ");
-            field.setStyle("-fx-fill: #2b4f81; -fx-font-weight: bold;");
+            String line = "[" + key + "]: " + value;
+            int start = styledArea.getLength();
+            styledArea.appendText(line + "\n");
 
-            Text val = new Text(value + "\n");
-            val.setStyle("-fx-fill: black;");
+            styledArea.setStyleClass(start, start + key.length() + 2, "field-name");
+            styledArea.setStyleClass(start + key.length() + 2, styledArea.getLength(), "field-value");
 
-            resultTextFlow.getChildren().addAll(field, val);
+            double lineWidth = estimateTextWidth(line);
+            if (lineWidth > maxWidth[0]) {
+                maxWidth[0] = lineWidth;
+            }
         });
+
+        styledArea.setPrefWidth(maxWidth[0] + 50);
     }
 
-    private void showMessageInTextFlow(String message, String color) {
-        resultTextFlow.getChildren().clear();
-        Text msg = new Text(message);
-        msg.setStyle("-fx-fill: " + color + "; -fx-font-weight: bold;");
-        resultTextFlow.getChildren().add(msg);
+
+    private void showMessageInStyledArea(String message, String styleClass) {
+        styledArea.clear();
+        styledArea.appendText(message);
+        styledArea.setStyleClass(0, message.length(), styleClass);
+    }
+
+    public void syncFormTypeWithCitizenController() {
+        String initialType = formTypeComboBox.getSelectionModel().getSelectedItem();
+        citizenController.updateAuthorityBasedOnFormType(initialType);
+    }
+
+    private double estimateTextWidth(String text) {
+        Text helper = new Text(text);
+        helper.setFont(ocrFont);
+
+        new Scene(new Group(helper));
+        helper.applyCss();
+
+        return helper.getLayoutBounds().getWidth();
     }
 }

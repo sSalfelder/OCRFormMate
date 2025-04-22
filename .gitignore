@@ -18,7 +18,7 @@ target/
 python/models/
 python/dictionaries/
 python/csvs/
-python/fonts/
+python/handwriting-fonts/
 *.pt
 *.bin
 *.safetensors

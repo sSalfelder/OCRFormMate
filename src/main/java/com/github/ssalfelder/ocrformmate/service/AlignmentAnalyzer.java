@@ -10,7 +10,7 @@ import static org.bytedeco.opencv.global.opencv_imgproc.*;
 public class AlignmentAnalyzer {
 
     public void analyzeLines(Mat image, String label) {
-        // 1. In Graustufen umwandeln (falls nötig)
+        // In Graustufen umwandeln
         Mat gray = new Mat();
         if (image.channels() > 1) {
             cvtColor(image, gray, COLOR_BGR2GRAY);
@@ -18,15 +18,15 @@ public class AlignmentAnalyzer {
             gray = image.clone();
         }
 
-        // 2. Canny-Kantenerkennung
+        // Canny-Kantenerkennung
         Mat edges = new Mat();
         Canny(gray, edges, 50, 200);
 
-        // 3. Hough-Linien finden (korrigierter Aufruf!)
+        // Hough-Linien finden
         Vec2fVector lines = new Vec2fVector();
         HoughLines(edges, lines, 1, Math.PI / 180, 100, 0, 0, 0, Math.PI);
 
-        // 4. Linienklassifikation
+        // Linienklassifikation
         int totalLines = (int) lines.size();
         int horizontal = 0, vertical = 0, diagonal = 0;
 
@@ -45,8 +45,7 @@ public class AlignmentAnalyzer {
             }
         }
 
-        // 5. Ausgabe
-        System.out.println("🔍 Analyse für: " + label);
+        System.out.println("Analyse für: " + label);
         System.out.println("  ➤ Gesamtlinien: " + totalLines);
         System.out.println("  ➤ Horizontal:   " + horizontal);
         System.out.println("  ➤ Vertikal:     " + vertical);

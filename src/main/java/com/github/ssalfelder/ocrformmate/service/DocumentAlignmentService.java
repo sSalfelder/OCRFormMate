@@ -14,14 +14,13 @@ import java.util.List;
 public class DocumentAlignmentService {
 
     public boolean alignDocument(String inputImagePath, String outputImagePath) {
-        // Bild laden
         Mat original = opencv_imgcodecs.imread(inputImagePath);
         if (original.empty()) {
             System.err.println("Konnte Bild nicht laden: " + inputImagePath);
             return false;
         }
 
-        // Vorverarbeitung: in Graustufen umwandeln, blurren, Kanten finden
+        // Graustufen umwandeln, blurren, Kanten finden
         Mat gray = new Mat();
         opencv_imgproc.cvtColor(original, gray, opencv_imgproc.COLOR_BGR2GRAY);
 
@@ -31,7 +30,7 @@ public class DocumentAlignmentService {
         Mat edges = new Mat();
         opencv_imgproc.Canny(blurred, edges, 75, 200);
 
-        // Konturen finden – hier erwartet findContours einen MatVector
+        // Konturen finden
         MatVector contours = new MatVector();
         Mat hierarchy = new Mat();
         opencv_imgproc.findContours(
@@ -47,10 +46,10 @@ public class DocumentAlignmentService {
         if (docContour == null) {
             System.out.println("Kein Formularrahmen erkannt – verwende Originalbild.");
             opencv_imgcodecs.imwrite(outputImagePath, original);
-            return true; // Weiterverarbeitung ohne Perspektivkorrektur
+            return true;
         }
 
-        // Ecken neu anordnen (top-left, top-right, bottom-right, bottom-left)
+        // Ecken neu anordnen
         Point2fVector sortedCorners = reorderCorners(docContour);
 
         // Zielgröße definieren
@@ -63,11 +62,10 @@ public class DocumentAlignmentService {
                 new Point2f(0, (float) height)
         );
 
-        // Konvertiere die Point2fVector-Objekte in Mat-Objekte:
         Mat srcMat = new Mat(sortedCorners);
         Mat dstMat = new Mat(dstCorners);
 
-        // Perspektivische Transformation berechnen und anwenden
+        // Perspektivische Transformation berechnen
         Mat transform = opencv_imgproc.getPerspectiveTransform(srcMat, dstMat);
         Mat aligned = new Mat();
         opencv_imgproc.warpPerspective(original, aligned, transform, new Size((int) width, (int) height));
@@ -80,7 +78,6 @@ public class DocumentAlignmentService {
     }
 
     private Point2fVector findDocumentContour(MatVector contours) {
-        // Sammle Kandidaten, deren approximierte Kontur genau 4 Ecken hat
         List<Mat> candidates = new ArrayList<>();
         for (long i = 0; i < contours.size(); i++) {
             Mat contour = contours.get(i);
@@ -96,13 +93,11 @@ public class DocumentAlignmentService {
             }
         }
 
-        // Wenn Kandidaten gefunden wurden, wähle den mit der größten Fläche
         if (!candidates.isEmpty()) {
             Mat largest = Collections.max(candidates, Comparator.comparingDouble(opencv_imgproc::contourArea));
             Mat approxCurve = new Mat();
             opencv_imgproc.approxPolyDP(largest, approxCurve, 0.02 * opencv_imgproc.arcLength(largest, true), true);
 
-            // 2) Konvertiere das Ergebnis-Mat in einen Point2fVector
             Point2fVector approx = new Point2fVector(approxCurve);
             return approx;
         }
@@ -110,13 +105,13 @@ public class DocumentAlignmentService {
     }
 
     private Point2fVector reorderCorners(Point2fVector polygon) {
-        // Konvertiere den Vector in eine List für einfaches Sortieren
+        // Listenkonvertierung für Sortierung
         List<Point2f> pts = new ArrayList<>();
         for (long i = 0; i < polygon.size(); i++) {
             pts.add(polygon.get(i));
         }
 
-        // Sortiere nach Y (kleinste Y-Werte oben)
+        // Sortiere nach Y
         pts.sort(Comparator.comparingDouble(p -> p.y()));
 
         Point2f top1 = pts.get(0);
@@ -142,7 +137,6 @@ public class DocumentAlignmentService {
             bottomRight = bottom1;
         }
 
-        // Erstelle einen neuen Point2fVector in der gewünschten Reihenfolge
         Point2fVector ordered = new Point2fVector(4);
         ordered.put(0, topLeft);
         ordered.put(1, topRight);
