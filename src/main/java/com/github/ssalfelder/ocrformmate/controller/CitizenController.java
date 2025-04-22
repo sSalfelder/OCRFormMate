@@ -7,6 +7,7 @@ import com.github.ssalfelder.ocrformmate.service.CitizenService;
 import com.github.ssalfelder.ocrformmate.service.OcrAssignmentService;
 import com.github.ssalfelder.ocrformmate.session.OcrSessionHolder;
 import com.github.ssalfelder.ocrformmate.ui.DialogHelper;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -14,7 +15,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.event.ActionEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -26,14 +26,11 @@ import java.io.IOException;
 @Component
 public class CitizenController {
 
-    //TODO Benutzername statt Email
     //TODO Ausgabefenster mit dem zu beschreibenden Formular
-    //TODO Ladeleiste in eine Richtung gehend (nicht hin und her)
     //TODO eingereicht am Zeitstempel auch im DialogHelper Fenster
     //TODO mehrseitiges PDF (ganzer Bürgergeldantrag)
 
     //TODO Clerkseite einrichten + zusätzliche Features
-    //TODO Weboberfläche zum Auslesen einrichten
     //TODO Neue Generierung zu Vornamen und neue Datensätze
     @Autowired
     private OcrAssignmentService ocrAssignmentService;
@@ -50,6 +47,9 @@ public class CitizenController {
     @Autowired
     private CitizenService citizenService;
 
+    @Autowired
+    private OcrController ocrController;
+
     private final String[] AUTHORITY = {"Jobcenter", "Meldeamt"};
 
     @FXML
@@ -60,16 +60,11 @@ public class CitizenController {
 
         citizenOCRSubmitButton.setDisable(!OcrSessionHolder.isAvailable());
 
-        String type = OcrSessionHolder.getFormType();
-        if ("Buergergeld".equals(type)) {
-            citizenAuthorityChooser.getSelectionModel().select("Jobcenter");
-            citizenAuthorityChooser.setDisable(true);
-        } else if ("Anmeldung".equals(type)) {
-            citizenAuthorityChooser.getSelectionModel().select("Meldeamt");
-            citizenAuthorityChooser.setDisable(true);
-        } else {
-            citizenAuthorityChooser.setDisable(false);
-        }
+        Platform.runLater(() -> {
+            ocrController.setCitizenController(this);
+            ocrController.syncFormTypeWithCitizenController();
+        });
+
     }
 
     private void updateLoginStatusLabel() {
@@ -146,7 +141,6 @@ public class CitizenController {
                     return;
                 }
 
-                // Nach erfolgreichem Login Statuslabel aktualisieren
                 updateLoginStatusLabel();
                 DialogHelper.showInfo("Login erfolgreich", "Sie sind nun angemeldet als:\n" +
                         CitizenSessionHolder.getUser().getEmail());
@@ -157,4 +151,15 @@ public class CitizenController {
         }
     }
 
+    public void updateAuthorityBasedOnFormType(String type) {
+        if ("Buergergeld".equals(type)) {
+            citizenAuthorityChooser.getSelectionModel().select("Jobcenter");
+            citizenAuthorityChooser.setDisable(true);
+        } else if ("Anmeldung".equals(type)) {
+            citizenAuthorityChooser.getSelectionModel().select("Meldeamt");
+            citizenAuthorityChooser.setDisable(true);
+        } else {
+            citizenAuthorityChooser.setDisable(false);
+        }
+    }
 }

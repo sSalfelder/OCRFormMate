@@ -54,7 +54,7 @@ public class FormFieldService {
             rectangle(alignedDoc, rect, new Scalar(0, 255, 0, 0), 2, LINE_8, 0);
         }
 
-        System.out.println("🧩 Felder aus Template [" + formType + "] gezeichnet: " + fields.size());
+        System.out.println("Felder aus Template [" + formType + "] gezeichnet: " + fields.size());
         imwrite("form_preview.png", alignedDoc);
         return alignedDoc;
     }

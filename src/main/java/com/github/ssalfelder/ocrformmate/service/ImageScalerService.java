@@ -9,7 +9,7 @@ import static org.bytedeco.opencv.global.opencv_imgcodecs.*;
 @Service
 public class ImageScalerService {
 
-    // Zielgröße z. B. A4 bei 300 DPI
+    // Zielgröße: A4 bei 300 DPI
     private final Size targetSize = new Size(2480, 3508);
 
     public String scaleToTargetSize(String inputPath, String outputPath) {

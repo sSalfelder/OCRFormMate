@@ -1,11 +1,15 @@
-/* Grundlegendes Styling */
+@font-face {
+    font-family: 'Roboto';
+    src: url('../fonts/Roboto-Regular.ttf');
+}
+
 .root {
     -fx-font-family: "Segoe UI", sans-serif;
     -fx-font-size: 14px;
     -fx-background-color: #f8f9fa;
 }
 
-/* Buttons */
+
 .button {
     -fx-padding: 6 12;
     -fx-background-radius: 5;
@@ -20,23 +24,43 @@
     -fx-background-color: #45a049;
 }
 
-/* ComboBox */
+#styledArea {
+    -fx-font-family: 'Roboto';
+    -fx-font-size: 14px;
+}
+
+
 .combo-box {
     -fx-background-radius: 5;
     -fx-border-radius: 5;
     -fx-padding: 4 8;
 }
 
-/* TextArea */
-.text-area {
-    -fx-control-inner-background: #ffffff;
-    -fx-border-color: #ccc;
-    -fx-border-radius: 4;
-    -fx-background-radius: 4;
-    -fx-padding: 10;
+
+.field-name {
+    -fx-fill: #2b4f81;
+    -fx-font-weight: bold;
 }
 
-/* ScrollPane mit ImageView */
+.field-value {
+    -fx-fill: black;
+}
+
+.styled-error {
+    -fx-fill: red;
+    -fx-font-weight: bold;
+}
+
+.styled-info {
+    -fx-fill: green;
+    -fx-font-weight: bold;
+}
+
+.styled-default {
+    -fx-fill: black;
+}
+
+
 .scroll-pane {
     -fx-background-color: transparent;
 }
@@ -44,10 +68,13 @@
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 0);
 }
 
-/* Abstand zwischen Controls */
 .hbox, .vbox {
     -fx-spacing: 10;
     -fx-padding: 10;
+}
+
+#progressBar > .bar {
+    -fx-background-color: linear-gradient(to right, #4CAF50, #8BC34A);
 }
 
 

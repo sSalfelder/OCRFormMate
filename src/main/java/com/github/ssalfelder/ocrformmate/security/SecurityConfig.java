@@ -32,10 +32,8 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
-                // 3. Standard-Login-Oberfläche deaktivieren
                 .formLogin(form -> form.disable())
 
-                // 4. HTTP Basic Auth ebenfalls deaktivieren
                 .httpBasic(httpBasic -> httpBasic.disable());
 
         return http.build();
@@ -44,6 +42,6 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService noopUserDetailsService() {
-        return username -> null; // Kein Benutzer vorhanden = keine Authentifizierung nötig
+        return username -> null;
     }
 }

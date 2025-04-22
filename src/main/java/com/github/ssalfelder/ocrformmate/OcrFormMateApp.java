@@ -24,8 +24,6 @@ public class OcrFormMateApp extends Application {
 
     @Override
     public void init() throws Exception {
-
-        // Spring Boot-Kontext starten
         springContext = SpringApplication.run(OcrFormMateApp.class);
 
     }
@@ -46,7 +44,6 @@ public class OcrFormMateApp extends Application {
 
     @Override
     public void stop() throws Exception {
-        // Beim Beenden JavaFX und Spring Boot sauber herunterfahren
         springContext.close();
         Platform.exit();
     }
@@ -56,7 +53,7 @@ public class OcrFormMateApp extends Application {
     }
 
     public static void main(String[] args) {
-        // JavaFX-Start (ruft später init() und start() auf)
+        // JavaFX-Start
         launch();
     }
 }

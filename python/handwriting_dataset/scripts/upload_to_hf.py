@@ -2,8 +2,9 @@ from datasets import load_dataset, Features, Value, Image
 from pathlib import Path
 import json
 
-base_dir = Path("D:/huggingface_datasets/handwriting_chunks")
+base_dir = Path("E:/huggingface_datasets/handwriting_chunks")
 chunk_index = 25
+
 jsonl_path = base_dir / f"dataset_chunk_{chunk_index:02}.jsonl"
 image_dir = base_dir / "images"
 fixed_jsonl = base_dir / "dataset_temp.jsonl"

@@ -13,9 +13,7 @@ public class AdminService {
     }
 
     public boolean isSecretValid(Integer adminId, String inputSecret) {
-        // Sucht den Admin mit der übergebenen ID
         Admin admin = adminRepository.findById(adminId).orElseThrow(() -> new RuntimeException("Admin nicht gefunden"));
-        // Vergleicht den in der Datenbank gespeicherten Wert mit der Benutzereingabe
         return admin.getSecret().equals(inputSecret);
     }
 }
