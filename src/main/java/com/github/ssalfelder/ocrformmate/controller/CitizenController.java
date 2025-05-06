@@ -5,6 +5,7 @@ import com.github.ssalfelder.ocrformmate.auth.CitizenSessionHolder;
 import com.github.ssalfelder.ocrformmate.model.User;
 import com.github.ssalfelder.ocrformmate.service.CitizenService;
 import com.github.ssalfelder.ocrformmate.service.OcrAssignmentService;
+import com.github.ssalfelder.ocrformmate.service.OcrResultService;
 import com.github.ssalfelder.ocrformmate.session.OcrSessionHolder;
 import com.github.ssalfelder.ocrformmate.ui.DialogHelper;
 import javafx.application.Platform;
@@ -16,10 +17,13 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.event.ActionEvent;
+import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
 
 import java.io.IOException;
 
@@ -50,6 +54,9 @@ public class CitizenController {
     @Autowired
     private OcrController ocrController;
 
+    @Autowired
+    private OcrResultService ocrResultService;
+
     private final String[] AUTHORITY = {"Jobcenter", "Meldeamt"};
 
     @FXML
@@ -70,9 +77,17 @@ public class CitizenController {
     private void updateLoginStatusLabel() {
         if (CitizenSessionHolder.isLoggedIn()) {
             User user = CitizenSessionHolder.getUser();
-            loginStatusLabel.setText("🟢 Angemeldet als: " + user.getEmail());
+            FontIcon icon = new FontIcon(MaterialDesignC.CHECK_CIRCLE);
+            icon.setIconSize(16);
+            icon.setIconColor(Color.GREEN);
+            loginStatusLabel.setGraphic(icon);
+            loginStatusLabel.setText(" Angemeldet als: " + user.getEmail());
         } else {
-            loginStatusLabel.setText("🔴 Nicht angemeldet");
+            FontIcon icon = new FontIcon(MaterialDesignC.CLOSE_CIRCLE);
+            icon.setIconSize(16);
+            icon.setIconColor(Color.RED);
+            loginStatusLabel.setGraphic(icon);
+            loginStatusLabel.setText(" Nicht angemeldet");
         }
     }
 
@@ -135,7 +150,6 @@ public class CitizenController {
                 stage.initModality(Modality.APPLICATION_MODAL); // blockiert andere Fenster
                 stage.showAndWait();
 
-                // Prüfen ob Login nach Dialog erfolgt ist
                 if (!CitizenSessionHolder.isLoggedIn()) {
                     System.out.println("Login wurde abgebrochen.");
                     return;

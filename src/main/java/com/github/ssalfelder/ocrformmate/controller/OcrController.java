@@ -2,6 +2,9 @@ package com.github.ssalfelder.ocrformmate.controller;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import com.github.ssalfelder.ocrformmate.init.OpenCvLoader;
@@ -27,6 +30,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.bytedeco.opencv.opencv_core.Rect;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 import org.bytedeco.opencv.opencv_core.Mat;
 import static org.bytedeco.opencv.global.opencv_imgcodecs.*;
@@ -37,7 +42,7 @@ import javafx.util.Duration;
 @Component
 public class OcrController {
 
-    private final OcrResultService ocrResultService;
+
     private final DocumentAlignmentService documentAlignmentService;
     private final FormFieldService formFieldDetectionService;
     private final AlignmentAnalyzer alignmentAnalyzer;
@@ -45,17 +50,19 @@ public class OcrController {
     private final ImageScalerService imageScalerService;
     private final OcrService ocrService;
     private final ImageDisplayService imageDisplayService;
+    private final PdfFormFillerService pdfFormFiller;
+    private final ResourceLoader resourceLoader;
 
     @Autowired
-    public OcrController(OcrResultService ocrResultService,
-                         DocumentAlignmentService documentAlignmentService,
+    public OcrController(DocumentAlignmentService documentAlignmentService,
                          FormFieldService formFieldDetectionService,
                          AlignmentAnalyzer alignmentAnalyzer,
                          PdfConverterService pdfConverterService,
                          ImageScalerService imageScalerService,
                          OcrService ocrservice,
-                         ImageDisplayService imageDisplayService) {
-        this.ocrResultService = ocrResultService;
+                         ImageDisplayService imageDisplayService,
+                         PdfFormFillerService pdfFormFiller,
+                         ResourceLoader resourceLoader) {
         this.documentAlignmentService = documentAlignmentService;
         this.formFieldDetectionService = formFieldDetectionService;
         this.alignmentAnalyzer = alignmentAnalyzer;
@@ -63,12 +70,16 @@ public class OcrController {
         this.imageScalerService = imageScalerService;
         this.ocrService = ocrservice;
         this.imageDisplayService = imageDisplayService;
+        this.pdfFormFiller = pdfFormFiller;
+        this.resourceLoader = resourceLoader;
     }
 
     @FXML
     private ComboBox<String> formTypeComboBox;
     @FXML
     private Button ocrButton;
+    @FXML
+    private Button transferButton;
     @FXML
     private ProgressBar progressBar;
     @FXML
@@ -80,6 +91,7 @@ public class OcrController {
     @FXML
     private StyleClassedTextArea styledArea;
 
+    private Map<String,String> lastRecognized;
     private final String[] FORMTYPE = {"Buergergeld", "Anmeldung"};
     private double scale = 1.0;
     private double mouseAnchorX;
@@ -170,7 +182,6 @@ public class OcrController {
 
     }
 
-    // Diese Methode wird beim Klick auf den Button aufgerufen
     @FXML
     private void onOcrButtonClicked(ActionEvent event) {
         OpenCvLoader.init();
@@ -272,9 +283,9 @@ public class OcrController {
 
             StringBuilder builder = new StringBuilder();
             recognizedFields.forEach((k, v) -> builder.append("[").append(k).append("]: ").append(v).append("\n"));
+            lastRecognized = recognizedFields;
 
             OcrSessionHolder.set(builder.toString());
-            ocrResultService.saveOcrResult(builder.toString());
 
             printImageResolution(image);
             citizenController.enableSubmitIfOcrAvailable();
@@ -287,7 +298,6 @@ public class OcrController {
             String inputPath = file.getAbsolutePath();
             String outputPngPath = "preview_from_pdf.png";
 
-            // 1. Vorverarbeitung
             if (inputPath.toLowerCase().endsWith(".pdf")) {
                 inputPath = pdfConverterService.convertPdfToPng(inputPath, outputPngPath, 300);
             } else {
@@ -299,7 +309,6 @@ public class OcrController {
                 }
             }
 
-            // 2. Bild laden (volle Qualität)
             Image image = new Image(new FileInputStream(outputPngPath));
             System.out.printf("Bildgröße (Original): %.1f x %.1f px%n", image.getWidth(), image.getHeight());
 
@@ -310,13 +319,20 @@ public class OcrController {
 
                 showMessageInStyledArea("Bild geladen. OCR kann jetzt gestartet werden.", "styled-info");
 
-                // 3. Fenster ggf. vergrößern + zentrieren
+                String selectedFormType = formTypeComboBox.getSelectionModel().getSelectedItem();
+                if ("Buergergeld".equalsIgnoreCase(selectedFormType)) {
+                    loadPdfViaPdfJs("Buergergeld.pdf");
+                } else {
+                    loadPdfViaPdfJs("Anmeldeformular_BMG.pdf");
+                }
+
+
+
                 Stage stage = (Stage) imageView.getScene().getWindow();
                 stage.setWidth(1200);
                 stage.setHeight(800);
                 stage.centerOnScreen();
 
-                // 4. Nach Layout-Pass: Zoom automatisch berechnen
                 PauseTransition pause = new PauseTransition(Duration.millis(100));
                 pause.setOnFinished(e -> {
                     if (imageView.getParent() != null) {
@@ -368,6 +384,25 @@ public class OcrController {
         styledArea.setPrefWidth(maxWidth[0] + 50);
     }
 
+    @FXML
+    protected void onTransferClicked(ActionEvent event) {
+        try {
+            Resource pdfRes = resourceLoader.getResource("classpath:static/pdf/Hauptantrag_Buergergeld.pdf");
+            File template   = pdfRes.getFile();
+            File outFile    = new File("output/Buergergeld_ausgefuellt.pdf");
+            File parent = outFile.getParentFile();
+            if (!parent.exists()) {
+                parent.mkdirs();
+            }
+
+            pdfFormFiller.fillForm(template, outFile, lastRecognized);
+            pdfWebView.getEngine().load(outFile.toURI().toString());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            DialogHelper.showError("Fehler", "Formular konnte nicht befüllt werden.");
+        }
+    }
+
 
     private void showMessageInStyledArea(String message, String styleClass) {
         styledArea.clear();
@@ -388,5 +423,15 @@ public class OcrController {
         helper.applyCss();
 
         return helper.getLayoutBounds().getWidth();
+    }
+
+    private void loadPdfViaPdfJs(String pdfResourcePath) {
+        String viewer = "http://localhost:8080/pdfjs/web/viewer.html";
+        String pdf         = "/pdf/" + pdfResourcePath;
+        String fullUrl = viewer
+                + "?file=" + URLEncoder.encode(pdf, StandardCharsets.UTF_8)
+                + "#page=1&zoom=page-width";
+        System.out.println("[DEBUG] fullUrl = " + fullUrl);
+        pdfWebView.getEngine().load(fullUrl);
     }
 }
