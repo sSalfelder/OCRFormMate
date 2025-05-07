@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Map;
 
 import com.github.ssalfelder.ocrformmate.init.OpenCvLoader;
@@ -179,7 +180,14 @@ public class OcrController {
             }
         }
 
-
+        String selectedFormType = formTypeComboBox.getSelectionModel().getSelectedItem();
+        if ("Buergergeld".equalsIgnoreCase(selectedFormType)) {
+            ensureWorkCopyExists("Buergergeld.pdf", "output/pdf/Buergergeld_Arbeitskopie.pdf");
+            loadPdfViaPdfJs("Buergergeld_Arbeitskopie.pdf");
+        } else {
+            ensureWorkCopyExists("Anmeldeformular_BMG.pdf", "output/Anmeldung_Arbeitskopie.pdf");
+            loadPdfViaPdfJs("Anmeldung_Arbeitskopie.pdf");
+        }
     }
 
     @FXML
@@ -387,21 +395,29 @@ public class OcrController {
     @FXML
     protected void onTransferClicked(ActionEvent event) {
         try {
-            Resource pdfRes = resourceLoader.getResource("classpath:static/pdf/Hauptantrag_Buergergeld.pdf");
-            File template   = pdfRes.getFile();
-            File outFile    = new File("output/Buergergeld_ausgefuellt.pdf");
+            File template = new File("output/pdf/Buergergeld_Arbeitskopie.pdf");
+            File outFile = new File("output/pdf/Buergergeld_ausgefuellt.pdf");
+
             File parent = outFile.getParentFile();
-            if (!parent.exists()) {
-                parent.mkdirs();
-            }
+            if (!parent.exists()) parent.mkdirs();
 
             pdfFormFiller.fillForm(template, outFile, lastRecognized);
-            pdfWebView.getEngine().load(outFile.toURI().toString());
+
+            String encodedPdfUrl = URLEncoder.encode("/filled/Buergergeld_ausgefuellt.pdf", StandardCharsets.UTF_8);
+            String timestamp = String.valueOf(System.currentTimeMillis());
+            String fullViewerUrl = "http://localhost:8080/pdfjs/web/viewer.html"
+                    + "?file=" + encodedPdfUrl + "&v=" + timestamp
+                    + "#page=1&zoom=page-width";
+
+            pdfWebView.getEngine().load(fullViewerUrl);
+            System.out.println("Formularübertrag abgeschlossen → WebView geladen mit Timestamp: " + timestamp);
+
         } catch (IOException ex) {
             ex.printStackTrace();
             DialogHelper.showError("Fehler", "Formular konnte nicht befüllt werden.");
         }
     }
+
 
 
     private void showMessageInStyledArea(String message, String styleClass) {
@@ -433,5 +449,18 @@ public class OcrController {
                 + "#page=1&zoom=page-width";
         System.out.println("[DEBUG] fullUrl = " + fullUrl);
         pdfWebView.getEngine().load(fullUrl);
+    }
+
+    private void ensureWorkCopyExists(String resourceName, String targetPath) {
+        try {
+            File targetFile = new File(targetPath);
+            if (!targetFile.exists()) {
+                Resource source = resourceLoader.getResource("classpath:static/pdf/" + resourceName);
+                Files.copy(source.getInputStream(), targetFile.toPath());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            showMessageInStyledArea("Fehler beim Erstellen der Arbeitskopie.", "styled-error");
+        }
     }
 }
