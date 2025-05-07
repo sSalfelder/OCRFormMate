@@ -66,6 +66,29 @@ public class OcrFormMateApp extends Application {
 **src\main\java\com\github\ssalfelder\ocrformmate\auth\CitizenSessionHolder.java**
 
 ```
+package com.github.ssalfelder.ocrformmate.auth;
+
+import com.github.ssalfelder.ocrformmate.model.User;
+
+public class CitizenSessionHolder {
+    private static User loggedInUser;
+
+    public static void setUser(User user) {
+        loggedInUser = user;
+    }
+
+    public static User getUser() {
+        return loggedInUser;
+    }
+
+    public static boolean isLoggedIn() {
+        return loggedInUser != null;
+    }
+
+    public static void clear() {
+        loggedInUser = null;
+    }
+}
 ```
 
 **src\main\java\com\github\ssalfelder\ocrformmate\auth\ClerkSessionHolder.java**
@@ -771,6 +794,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Map;
 
 import com.github.ssalfelder.ocrformmate.init.OpenCvLoader;
@@ -945,7 +969,14 @@ public class OcrController {
             }
         }
 
-
+        String selectedFormType = formTypeComboBox.getSelectionModel().getSelectedItem();
+        if ("Buergergeld".equalsIgnoreCase(selectedFormType)) {
+            ensureWorkCopyExists("Buergergeld.pdf", "output/pdf/Buergergeld_Arbeitskopie.pdf");
+            loadPdfViaPdfJs("Buergergeld_Arbeitskopie.pdf");
+        } else {
+            ensureWorkCopyExists("Anmeldeformular_BMG.pdf", "output/Anmeldung_Arbeitskopie.pdf");
+            loadPdfViaPdfJs("Anmeldung_Arbeitskopie.pdf");
+        }
     }
 
     @FXML
@@ -1153,21 +1184,29 @@ public class OcrController {
     @FXML
     protected void onTransferClicked(ActionEvent event) {
         try {
-            Resource pdfRes = resourceLoader.getResource("classpath:static/pdf/Hauptantrag_Buergergeld.pdf");
-            File template   = pdfRes.getFile();
-            File outFile    = new File("output/Buergergeld_ausgefuellt.pdf");
+            File template = new File("output/pdf/Buergergeld_Arbeitskopie.pdf");
+            File outFile = new File("output/pdf/Buergergeld_ausgefuellt.pdf");
+
             File parent = outFile.getParentFile();
-            if (!parent.exists()) {
-                parent.mkdirs();
-            }
+            if (!parent.exists()) parent.mkdirs();
 
             pdfFormFiller.fillForm(template, outFile, lastRecognized);
-            pdfWebView.getEngine().load(outFile.toURI().toString());
+
+            String encodedPdfUrl = URLEncoder.encode("/filled/Buergergeld_ausgefuellt.pdf", StandardCharsets.UTF_8);
+            String timestamp = String.valueOf(System.currentTimeMillis());
+            String fullViewerUrl = "http://localhost:8080/pdfjs/web/viewer.html"
+                    + "?file=" + encodedPdfUrl + "&v=" + timestamp
+                    + "#page=1&zoom=page-width";
+
+            pdfWebView.getEngine().load(fullViewerUrl);
+            System.out.println("Formularübertrag abgeschlossen → WebView geladen mit Timestamp: " + timestamp);
+
         } catch (IOException ex) {
             ex.printStackTrace();
             DialogHelper.showError("Fehler", "Formular konnte nicht befüllt werden.");
         }
     }
+
 
 
     private void showMessageInStyledArea(String message, String styleClass) {
@@ -1199,6 +1238,52 @@ public class OcrController {
                 + "#page=1&zoom=page-width";
         System.out.println("[DEBUG] fullUrl = " + fullUrl);
         pdfWebView.getEngine().load(fullUrl);
+    }
+
+    private void ensureWorkCopyExists(String resourceName, String targetPath) {
+        try {
+            File targetFile = new File(targetPath);
+            if (!targetFile.exists()) {
+                Resource source = resourceLoader.getResource("classpath:static/pdf/" + resourceName);
+                Files.copy(source.getInputStream(), targetFile.toPath());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            showMessageInStyledArea("Fehler beim Erstellen der Arbeitskopie.", "styled-error");
+        }
+    }
+}
+```
+
+**src\main\java\com\github\ssalfelder\ocrformmate\controller\PdfServeController.java**
+
+```
+package com.github.ssalfelder.ocrformmate.controller;
+
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.File;
+
+@RestController
+@RequestMapping("/filled")
+public class PdfServeController {
+
+    @GetMapping("/{filename:.+}")
+    public ResponseEntity<Resource> getPdf(@PathVariable String filename) {
+        File pdfFile = new File("output/pdf/" + filename);
+
+        if (!pdfFile.exists()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        FileSystemResource resource = new FileSystemResource(pdfFile);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+
+        return new ResponseEntity<>(resource, headers, HttpStatus.OK);
     }
 }
 ```
@@ -3050,37 +3135,70 @@ import java.util.Map;
 
 @Service
 public class PdfFormFillerService {
-    private static final Map<String,String> FIELD_NAME_MAP = Map.of(
-            "familienname",     "PersFam",
-            "vorname",          "PersVorn",
-            "geburtsdatum",     "PersGebDat"
+
+    private static final Map<String, String> FIELD_NAME_MAP = Map.ofEntries(
+            Map.entry("familienname", "txtfPersonNachname"),
+            Map.entry("vorname", "txtfPersonVorname"),
+            Map.entry("geburtsdatum", "datePersonGebDatum"),
+            Map.entry("geburtsname", "txtfPersonGebName"),
+            Map.entry("geburtsort", "txtfPersonGebOrt"),
+            Map.entry("geburtsland", "txtfPersonGebLand"),
+            Map.entry("staatsangehoerigkeit", "txtfPersonStaatsangehoerigkeit"),
+            Map.entry("telefonnummer", "txtfPersonTel"),
+            Map.entry("wohnort", "txtfPersonOrt"),
+            Map.entry("postleitzahl", "txtfPersonPostfach"),
+            Map.entry("rentenversicherungsnummer", "txtfPersonSVRNr")
     );
 
-    public void fillForm(File templatePdf, File outPdf, Map<String,String> ocrValues) throws IOException {
+
+
+
+    public void fillForm(File templatePdf, File outPdf, Map<String, String> ocrValues) throws IOException {
         try (PDDocument doc = PDDocument.load(templatePdf)) {
             PDAcroForm form = doc.getDocumentCatalog().getAcroForm();
+
             if (form == null) throw new IllegalStateException("Kein AcroForm im PDF!");
 
+            form.setNeedAppearances(true);
+
             System.out.println("→ Alle Formularfelder im Template:");
-            form.getFields().forEach(f -> System.out.println("   • " + f.getFullyQualifiedName()));
+            for (PDField field : form.getFieldTree()) {
+                System.out.println("   • " + field.getFullyQualifiedName());
+            }
 
             for (var entry : ocrValues.entrySet()) {
                 String key = entry.getKey();
                 String value = entry.getValue();
                 String pdfFieldName = FIELD_NAME_MAP.get(key);
+
                 if (pdfFieldName != null) {
                     PDField field = form.getField(pdfFieldName);
                     if (field != null) {
-                        field.setValue(value);
+                        try {
+                            field.setValue(value);
+                            field.setReadOnly(false); // optional
+                            System.out.println("Eingetragen: " + pdfFieldName + " = " + value);
+                        } catch (Exception e) {
+                            System.err.println("Fehler beim Setzen von " + pdfFieldName + ": " + e.getMessage());
+                        }
                     } else {
                         System.err.println("Feld nicht gefunden: " + pdfFieldName);
                     }
                 }
             }
+
+
+            form.refreshAppearances();
+
+            File parent = outPdf.getParentFile();
+            if (!parent.exists()) parent.mkdirs();
+
             doc.save(outPdf);
+            System.out.println("PDF gespeichert unter: " + outPdf.getAbsolutePath());
         }
     }
 }
+
 ```
 
 **src\main\java\com\github\ssalfelder\ocrformmate\session\OcrSessionHolder.java**

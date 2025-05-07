@@ -27,10 +27,12 @@ public class SecurityConfig {
                                 "/clerk/validate",
                                 "/ping",
                                 "/pdfjs/**",
-                                "/pdf/**"
+                                "/pdf/**",
+                                "/filled/**"  // <- diesen Eintrag hinzufügen!
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
+
 
                 .formLogin(form -> form.disable())
 
