@@ -58,7 +58,7 @@ Die API läuft dann standardmäßig auf `http://127.0.0.1:6000`
 ### Anforderungen:
 
 - Java 17+
-- Maven oder Gradle
+- Maven
 - JavaFX SDK
 
 ### Hauptklassen:
@@ -84,6 +84,7 @@ Die API läuft dann standardmäßig auf `http://127.0.0.1:6000`
 
 - Java 17+
 - Spring Boot (Maven-basiert)
+- MariaDB-Datenbank (bspw. über XAMPP)
 
 ### Hauptklassen:
 
@@ -92,10 +93,26 @@ Die API läuft dann standardmäßig auf `http://127.0.0.1:6000`
 - `FormDataRepository.java` – DB-Zugriff über JPA
 - `FormData.java` – Entity-Klasse
 
+### Datenbank einrichten
+
+Die Anwendung erwartet eine laufende MariaDB-Instanz mit folgenden Eigenschaften:
+
+- Host: `localhost`
+- Port: `3311`
+- Datenbankname: `ocr_formmate`
+- Benutzer: `root`
+- Passwort: *(leer)*
+
+Stelle sicher, dass bspw. XAMPP gestartet wird, bevor du die Anwendung ausführst. Die MariaDB-Datenbank muss erreichbar sein, sonst kann sich Spring Boot nicht verbinden.
+Falls du eine andere Konfiguration verwendest (z. B. anderen Port oder Passwort), musst du die Datei `src/main/resources/application.properties` entsprechend anpassen:
+
+`spring.datasource.url=jdbc:mariadb://localhost:3311/ocr_formmate
+spring.datasource.username=root
+spring.datasource.password=`
+
 ### Funktionen:
 
 - Speichern & Laden von erkannten Formularinhalten
-- Bereitstellung einer JSON-Schnittstelle für das Frontend
 
 ---
 
