@@ -19,8 +19,7 @@ OCRFormMate ist ein vollumfängliches OCR-Tool zur Erkennung und strukturierten 
 | ------------- | ------------------------------ |
 | OCR-Erkennung | Python, Flask, Transformers    |
 | Frontend      | Java 17+, JavaFX               |
-| Backend       | Java 17+, Spring Boot, JPA     |
-| Persistenz    | H2 / PostgreSQL / beliebige DB |
+| Backend       | Spring Boot, JPA (mit MariaDB) |
 
 ---
 
