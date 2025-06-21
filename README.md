@@ -115,6 +115,23 @@ spring.datasource.password=`
 
 ---
 
+### Unterstütztes Formular
+
+Aktuell ist nur die erste Seite des Bürgergeld-Hauptantrags (nach §37 SGB II) abgedeckt.
+
+Da die Originalformulare urheber- oder nutzungsrechtlich geschützt sein können, stelle ich nur einen beispielhaften Screenshot zur Illustration bereit (ohne echte personenbezogene Daten).
+
+Das Mapping basiert auf einem Screenshot der ersten Seite – dieser dient nur zu Demonstrationszwecken.
+
+Originalformulare sind z. B. hier verfügbar:
+https://www.arbeitsagentur.de/formulare
+
+### Beispielbild
+
+<img src="docs/img/Testseite_Buergergeld_Screenshot.png" alt="Formularbeispiel" width="300"/>
+
+Weitere Seiten (z. B. Anlagen) sind momentan noch nicht gemappt, aber die Architektur ist für eine Erweiterung vorbereitet.
+
 ## Beispielablauf
 
 1. Nutzer startet die JavaFX-GUI
